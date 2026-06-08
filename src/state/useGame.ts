@@ -226,6 +226,7 @@ export function useGame() {
   const [ackedSeq, setAckedSeq]     = useState(-1);
   const [stepMode, setStepMode]     = useState(false);
   const [stepAdvances, setStepAdvances] = useState(0);
+  const [gameKey, setGameKey]       = useState(0);  // increments on each newGame — forces bot effect to re-run even when other deps unchanged
   const stepConsumedRef = useRef(0);  // tracks how many advances have been consumed
   const rngRef          = useRef<Rng>(makeRng(Date.now()));
   const timerRef        = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -358,6 +359,7 @@ export function useGame() {
       }
     }
   }, [
+    gameKey,                                   // new game always re-fires even if phase/idx unchanged
     ackedSeq,                                  // acknowledgement fires the effect again
     stepMode,                                  // step mode toggle
     stepAdvances,                              // increment triggers effect after Avançar click
@@ -376,6 +378,7 @@ export function useGame() {
 
     newGame: (config: Engine.GameConfig) => {
       setAckedSeq(-1);                       // reset acknowledgement for new game
+      setGameKey(k => k + 1);               // force bot-automation effect to re-run after INIT
       rngRef.current = makeRng(Date.now());
       dispatch({ t: 'INIT', config, seed: Date.now() });
     },

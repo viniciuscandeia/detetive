@@ -54,8 +54,8 @@ export default function Board({ api }: Props) {
       }
       group.forEach((p, i) => {
         result.set(p.idx, {
-          left: baseCol * CS + 2 + (i % 3) * 7,
-          top:  baseRow * CS + 3 + Math.floor(i / 3) * 6,
+          left: baseCol * CS + (i % 3) * 4,
+          top:  baseRow * CS + Math.floor(i / 3) * 4,
         })
       })
     })

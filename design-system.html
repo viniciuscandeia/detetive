@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DETETIVE — Sistema de Design · Arquivo Confidencial Nº 9</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap');
+
+    :root {
+      --ink-950:#090810; --ink-900:#0f0d1a; --ink-800:#16132a; --ink-700:#1e1b38;
+      --ink-600:#2a2440; --ink-500:#4a3f6a;
+      --gold-700:#8a6a30; --gold-600:#b5893e; --gold-500:#d4a853;
+      --gold-400:#e8be6a; --gold-300:#f0d090; --gold-rgb:212,168,83;
+      --crimson-700:#6b1515; --crimson-600:#9a1f1f;
+      --crimson-500:#c22828; --crimson-400:#e84040;
+      --parchment-900:#3e3530; --parchment-700:#8a7a62;
+      --parchment-400:#dfd2bc; --parchment-200:#f0e6d0;
+      --success-700:#1d5236; --success-500:#2d7a50; --success-400:#5cb888;
+      --evidence-blue:#6aacf0; --evidence-blue-bg:rgba(16,26,44,.95);
+      --passage-violet:#6060a0;
+      --bg:var(--ink-950); --surface:var(--ink-900); --card:var(--ink-800);
+      --card-hi:var(--ink-700); --border:var(--ink-600); --border-hi:var(--ink-500);
+      --gold:var(--gold-500); --gold-dim:var(--gold-700);
+      --gold-faint:rgba(var(--gold-rgb),.08); --gold-glow:rgba(var(--gold-rgb),.18);
+      --crimson:var(--crimson-600); --crimson-hi:var(--crimson-500);
+      --danger:var(--crimson-600);
+      --text:var(--parchment-400); --text-dim:var(--parchment-700);
+      --text-faint:var(--parchment-900); --success:var(--success-500);
+      --font-head:'Playfair Display',Georgia,'Times New Roman',serif;
+      --font-body:'Courier Prime','Courier New',Courier,monospace;
+      --shadow-sm:0 2px 8px rgba(0,0,0,.5); --shadow-md:0 4px 24px rgba(0,0,0,.7);
+      --shadow-lg:0 8px 48px rgba(0,0,0,.9);
+      --shadow-in:inset 0 1px 0 rgba(255,255,255,.03);
+      --fs-display:clamp(2.4rem,6vw,4.8rem); --fs-h1:clamp(1.6rem,4vw,2.6rem);
+      --fs-h2:clamp(1.2rem,2.5vw,1.6rem); --fs-h3:1.1rem;
+      --fs-body:.9rem; --fs-mono:.85rem; --fs-caption:.72rem; --fs-stamp:.62rem;
+      --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px;
+      --space-5:24px; --space-6:32px; --space-7:48px; --space-8:64px; --space-9:96px;
+      --radius-sm:3px; --radius-md:6px; --radius-lg:12px; --radius-xl:20px;
+      --radius-full:50%;
+      --radius-dossier:2px 2px 8px 8px; --radius-dossier-lg:2px 2px 12px 12px;
+      --elev-1:0 2px 8px rgba(0,0,0,.5); --elev-2:0 4px 24px rgba(0,0,0,.7);
+      --elev-3:0 8px 48px rgba(0,0,0,.9);
+      --elev-gold:0 0 32px rgba(var(--gold-rgb),.15);
+      --elev-crimson:0 0 32px rgba(154,31,31,.25);
+      --elev-in:inset 0 1px 0 rgba(255,255,255,.03);
+      --ease-spring:cubic-bezier(.34,1.56,.64,1);
+      --ease-dramatic:cubic-bezier(.22,1,.36,1);
+      --ease-snappy:cubic-bezier(.4,0,.2,1);
+      --dur-fast:100ms; --dur-base:150ms; --dur-slow:300ms; --dur-cinematic:850ms;
+      --z-board:5; --z-overlay:20; --z-modal:100; --z-menu:299; --z-fab:300; --z-scanline:9999;
+      --suspect-0:#c0392b; --suspect-1:#e67e22; --suspect-2:#8e44ad;
+      --suspect-3:#27ae60; --suspect-4:#bdc3c7; --suspect-5:#2980b9;
+      --room-0:#2e1405; --room-1:#051526; --room-2:#082e18; --room-3:#2e0808;
+      --room-4:#100830; --room-5:#1c1005; --room-6:#1c1200; --room-7:#031420; --room-8:#101800;
+    }
+
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+
+    body {
+      background:var(--bg);
+      color:var(--text);
+      font-family:var(--font-body);
+      font-size:16px;
+      line-height:1.6;
+      overflow-x:hidden;
+      background-image:
+        radial-gradient(ellipse at 18% 40%,rgba(60,30,100,.12) 0%,transparent 55%),
+        radial-gradient(ellipse at 82% 60%,rgba(120,20,20,.08) 0%,transparent 50%);
+    }
+    body::after {
+      content:'';position:fixed;inset:0;
+      background-image:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.04) 2px,rgba(0,0,0,.04) 4px);
+      pointer-events:none;z-index:var(--z-scanline);
+    }
+    a{color:var(--gold);text-decoration:none}
+    a:hover{color:var(--gold-400)}
+
+    /* ── Nav ─────────────────────────────────────────────── */
+    .ds-nav {
+      position:sticky;top:0;z-index:var(--z-menu);
+      background:rgba(9,8,16,.93);backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--border);padding:0 var(--space-5);
+    }
+    .ds-nav-inner {
+      max-width:1200px;margin:0 auto;
+      display:flex;align-items:center;gap:var(--space-5);height:52px;
+      overflow-x:auto;scrollbar-width:none;
+    }
+    .ds-nav-inner::-webkit-scrollbar{display:none}
+    .ds-nav-logo {
+      font-family:var(--font-head);font-weight:700;font-size:.95rem;
+      color:var(--gold);letter-spacing:.15em;white-space:nowrap;flex-shrink:0;
+    }
+    .ds-nav-sep{width:1px;height:22px;background:var(--border);flex-shrink:0}
+    .ds-nav-links{display:flex;gap:4px;list-style:none;flex-shrink:0}
+    .ds-nav-links a {
+      font-family:var(--font-body);font-size:var(--fs-stamp);color:var(--text-dim);
+      text-transform:uppercase;letter-spacing:.12em;
+      padding:3px var(--space-2);border-radius:var(--radius-sm);white-space:nowrap;
+      transition:color var(--dur-base),background var(--dur-base);
+    }
+    .ds-nav-links a:hover{color:var(--gold);background:var(--gold-faint)}
+
+    /* ── Hero ────────────────────────────────────────────── */
+    .ds-hero {
+      position:relative;min-height:100vh;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      text-align:center;overflow:hidden;padding:var(--space-8) var(--space-5);
+    }
+    .ds-hero::before {
+      content:'';position:absolute;inset:0;
+      background:
+        radial-gradient(ellipse 80% 55% at 50% -5%,rgba(var(--gold-rgb),.09) 0%,transparent 65%),
+        radial-gradient(ellipse at 50% 50%,rgba(9,8,16,0) 0%,rgba(9,8,16,.45) 100%);
+      pointer-events:none;
+    }
+    .ds-hero::after {
+      content:'';position:absolute;inset:0;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events:none;opacity:.7;
+    }
+    .hero-stamp {
+      position:absolute;top:18%;right:7%;
+      font-family:var(--font-head);font-weight:700;font-size:1rem;
+      letter-spacing:.3em;color:var(--crimson);
+      border:2px solid var(--crimson);padding:var(--space-2) var(--space-4);
+      border-radius:2px;transform:rotate(-12deg);opacity:.85;z-index:2;text-transform:uppercase;
+      animation:stampFadeIn 1.4s var(--ease-dramatic) .5s both;
+    }
+    .hero-content{position:relative;z-index:2;max-width:900px;animation:heroFadeIn 1.2s var(--ease-dramatic) both}
+    .hero-eyebrow {
+      font-family:var(--font-body);font-size:var(--fs-stamp);
+      letter-spacing:.5em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:var(--space-4);
+    }
+    .hero-title {
+      font-family:var(--font-head);font-weight:700;
+      font-size:clamp(5rem,16vw,13rem);line-height:.88;letter-spacing:.06em;
+      background:linear-gradient(135deg,var(--parchment-400) 0%,var(--gold-400) 30%,var(--parchment-200) 50%,var(--gold-500) 70%,var(--parchment-400) 100%);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+      margin-bottom:var(--space-5);
+    }
+    .hero-sub {
+      font-family:var(--font-head);font-size:clamp(1rem,2.5vw,1.4rem);
+      font-style:italic;color:var(--text-dim);margin-bottom:var(--space-3);
+    }
+    .hero-tagline {
+      font-family:var(--font-body);font-size:var(--fs-caption);
+      color:var(--text-faint);letter-spacing:.18em;text-transform:uppercase;margin-bottom:var(--space-7);
+    }
+    .hero-nav {
+      display:flex;flex-wrap:wrap;gap:var(--space-2);justify-content:center;
+      list-style:none;border-top:1px solid var(--border);padding-top:var(--space-5);
+    }
+    .hero-nav a {
+      font-family:var(--font-body);font-size:var(--fs-caption);color:var(--text-dim);
+      letter-spacing:.12em;text-transform:uppercase;
+      padding:var(--space-2) var(--space-3);border:1px solid var(--border);
+      border-radius:var(--radius-sm);transition:all var(--dur-base);
+    }
+    .hero-nav a:hover{color:var(--gold);border-color:var(--gold-dim);background:var(--gold-faint)}
+
+    /* ── Section structure ───────────────────────────────── */
+    .ds-container{max-width:1200px;margin:0 auto;padding:0 var(--space-5)}
+    .ds-section{padding:var(--space-9) 0;border-top:1px solid var(--border)}
+    .ds-section-label {
+      font-family:var(--font-body);font-size:var(--fs-stamp);
+      letter-spacing:.4em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:var(--space-2);
+    }
+    .ds-heading {
+      font-family:var(--font-head);font-weight:700;font-size:var(--fs-h1);
+      color:var(--parchment-400);margin-bottom:var(--space-4);
+    }
+    .ds-subheading {
+      font-family:var(--font-head);font-weight:600;font-size:var(--fs-h2);
+      color:var(--parchment-400);margin-bottom:var(--space-3);margin-top:var(--space-7);
+    }
+    .ds-rule{border:none;border-top:1px solid var(--gold-dim);margin-bottom:var(--space-7);opacity:.5}
+    .ds-desc{font-family:var(--font-body);font-size:var(--fs-body);color:var(--text-dim);max-width:720px;margin-bottom:var(--space-6);line-height:1.75}
+    .comp-label {
+      font-family:var(--font-body);font-size:var(--fs-caption);letter-spacing:.3em;
+      text-transform:uppercase;color:var(--text-faint);
+      margin-top:var(--space-7);margin-bottom:var(--space-4);
+      display:flex;align-items:center;gap:var(--space-3);
+    }
+    .comp-label::after{content:'';flex:1;height:1px;background:var(--border)}
+    .demo-wrap{padding:var(--space-6);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:var(--space-5)}
+    .token-chip {
+      display:inline-block;font-family:var(--font-body);font-size:var(--fs-stamp);
+      color:var(--gold-400);background:rgba(var(--gold-rgb),.08);
+      border:1px solid rgba(var(--gold-rgb),.2);border-radius:var(--radius-sm);
+      padding:1px var(--space-2);white-space:nowrap;
+    }
+
+    /* ── Color swatches ──────────────────────────────────── */
+    .color-group{margin-bottom:var(--space-6)}
+    .color-group-label {
+      font-family:var(--font-body);font-size:var(--fs-caption);letter-spacing:.3em;
+      text-transform:uppercase;color:var(--text-dim);margin-bottom:var(--space-3);
+    }
+    .swatch-row{display:flex;flex-wrap:wrap;gap:var(--space-2)}
+    .swatch{display:flex;flex-direction:column;min-width:120px;border-radius:var(--radius-sm);overflow:hidden;border:1px solid rgba(255,255,255,.06)}
+    .swatch-color{height:68px}
+    .swatch-info{background:var(--surface);padding:var(--space-2) var(--space-3);border-top:1px solid var(--border)}
+    .swatch-name{font-family:var(--font-body);font-size:var(--fs-caption);color:var(--gold-400);font-weight:700}
+    .swatch-hex{font-family:var(--font-body);font-size:var(--fs-stamp);color:var(--text-dim);letter-spacing:.04em}
+    .swatch-role{font-family:var(--font-body);font-size:var(--fs-stamp);color:var(--text-faint);margin-top:1px}
+
+    /* ── Typography ──────────────────────────────────────── */
+    .type-group {
+      padding:var(--space-6);background:var(--surface);
+      border:1px solid var(--border);border-top:2px solid var(--gold-dim);
+      border-radius:var(--radius-dossier);margin-bottom:var(--space-5);
+    }
+    .type-family-label {
+      font-family:var(--font-body);font-size:var(--fs-caption);letter-spacing:.3em;
+      text-transform:uppercase;color:var(--gold-dim);margin-bottom:var(--space-5);
+    }
+    .type-row {
+      display:flex;align-items:baseline;gap:var(--space-6);
+      padding:var(--space-3) 0;border-bottom:1px solid var(--border);
+    }
+    .type-row:last-child{border-bottom:none}
+    .type-meta{min-width:130px;flex-shrink:0}
+    .type-token{font-family:var(--font-body);font-size:var(--fs-caption);color:var(--gold-400);display:block}
+    .type-size{font-family:var(--font-body);font-size:var(--fs-stamp);color:var(--text-dim)}
+    .type-specimen-text{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+
+    /* Type specimen combined */
+    .type-specimen-combined {
+      padding:var(--space-6);background:var(--card);
+      border:1px solid var(--border);border-top:2px solid var(--gold-dim);
+      border-radius:var(--radius-dossier);
+    }
+    .tsc-heading {
+      font-family:var(--font-head);font-size:clamp(1.6rem,4vw,2.2rem);
+      font-weight:700;color:var(--parchment-400);margin-bottom:var(--space-2);
+    }
+    .tsc-sub {
+      font-family:var(--font-body);font-size:var(--fs-stamp);
+      color:var(--gold-dim);letter-spacing:.25em;text-transform:uppercase;margin-bottom:var(--space-5);
+    }
+    .tsc-body {
+      font-family:var(--font-body);font-size:var(--fs-body);
+      color:var(--text-dim);line-height:1.8;max-width:560px;
+    }
+    .tsc-quote {
+      font-family:var(--font-head);font-style:italic;font-size:1.05rem;
+      color:var(--parchment-400);border-left:3px solid var(--gold-dim);
+      padding-left:var(--space-4);margin-top:var(--space-5);
+    }
+
+    /* ── Spacing ─────────────────────────────────────────── */
+    .spacing-grid{display:grid;gap:var(--space-3)}
+    .spacing-row{display:flex;align-items:center;gap:var(--space-4)}
+    .spacing-label{font-family:var(--font-body);font-size:var(--fs-caption);color:var(--gold-400);min-width:90px;flex-shrink:0}
+    .spacing-bar{height:16px;background:linear-gradient(90deg,var(--gold-500),var(--gold-700));border-radius:var(--radius-sm);min-width:4px}
+    .spacing-value{font-family:var(--font-body);font-size:var(--fs-caption);color:var(--text-dim)}
+
+    /* ── Radius ──────────────────────────────────────────── */
+    .radius-grid{display:flex;flex-wrap:wrap;gap:var(--space-5)}
+    .radius-item{display:flex;flex-direction:column;align-items:center;gap:var(--space-2);min-width:120px}
+    .radius-box{width:80px;height:56px;background:var(--card);border:2px solid var(--gold-dim)}
+    .radius-token{font-family:var(--font-body);font-size:var(--fs-caption);color:var(--gold-400);text-align:center}
+    .radius-value{font-family:var(--font-body);font-size:var(--fs-stamp);color:var(--text-dim);text-align:center}
+
+    /* ── Elevation ───────────────────────────────────────── */
+    .elev-grid{display:flex;flex-wrap:wrap;gap:var(--space-5)}
+    .elev-card {
+      width:180px;padding:var(--space-5);background:var(--card);
+      border:1px solid var(--border);border-radius:var(--radius-dossier);
+    }
+    .elev-card-label{font-family:var(--font-body);font-size:var(--fs-caption);color:var(--gold-400);display:block;margin-bottom:var(--space-2)}
+    .elev-card-desc{font-family:var(--font-body);font-size:var(--fs-stamp);color:var(--text-dim)}
+
+    /* ── Motion ──────────────────────────────────────────── */
+    .motion-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--space-5)}
+    .motion-demo {
+      padding:var(--space-5);background:var(--surface);
+      border:1px solid var(--border);border-radius:var(--radius-dossier);text-align:center;
+    }
+    .motion-label {
+      font-family:var(--font-body);font-size:var(--fs-caption);letter-spacing:.2em;
+      text-transform:uppercase;color:var(--gold-dim);margin-bottom:var(--space-2);
+    }
+    .motion-token{font-family:var(--font-body);font-size:var(--fs-stamp);color:var(--text-faint);margin-bottom:var(--space-5)}
+    .motion-stage{height:80px;display:flex;align-items:center;justify-content:center;margin-bottom:var(--space-3)}
+    .motion-hint{font-family:var(--font-body);font-size:var(--fs-caption);color:var(--text-faint)}
+    .spring-ball{width:40px;height:40px;border-radius:var(--radius-full);background:var(--gold);cursor:pointer;transition:transform var(--dur-slow) var(--ease-spring)}
+    .spring-ball:hover{transform:translateY(-36px) scale(1.15)}
+    .dramatic-card-demo {
+      width:96px;height:54px;background:var(--card);border:1px solid var(--gold-dim);
+      border-top-width:2px;border-radius:var(--radius-dossier);cursor:pointer;
+      transition:transform var(--dur-cinematic) var(--ease-dramatic),box-shadow var(--dur-cinematic) var(--ease-dramatic);
+      display:flex;align-items:center;justify-content:center;
+      font-family:var(--font-head);font-size:var(--fs-caption);color:var(--gold-dim);font-style:italic;
+    }
+    .dramatic-card-demo:hover{transform:translateY(-16px);box-shadow:0 24px 48px rgba(0,0,0,.8),var(--elev-gold)}
+    .snappy-btn-demo {
+      padding:var(--space-2) var(--space-4);background:var(--card);
+      border:1px solid var(--border);border-radius:var(--radius-md);
+      color:var(--text);font-family:var(--font-body);font-size:var(--fs-body);cursor:pointer;
+      transition:transform var(--dur-fast) var(--ease-snappy),background var(--dur-fast) var(--ease-snappy);
+    }
+    .snappy-btn-demo:hover{transform:scale(1.06) translateY(-2px);background:var(--card-hi)}
+    .motion-table{width:100%;border-collapse:collapse;font-family:var(--font-body);font-size:var(--fs-caption);margin-top:var(--space-6)}
+    .motion-table th{text-align:left;padding:var(--space-2) var(--space-3);border-bottom:1px solid var(--border);color:var(--gold-dim);font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+    .motion-table td{padding:var(--space-2) var(--space-3);border-bottom:1px solid rgba(42,36,64,.5);color:var(--text)}
+    .motion-table td:first-child{color:var(--gold-400);font-weight:700}
+    .motion-table td:nth-child(2){color:var(--text-dim);font-size:var(--fs-stamp)}
+
+    /* ── Suspects ────────────────────────────────────────── */
+    .suspect-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:var(--space-4)}
+    .suspect-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-dossier);overflow:hidden;transition:transform var(--dur-base),box-shadow var(--dur-base)}
+    .suspect-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
+    .suspect-head{height:6px}
+    .suspect-body{padding:var(--space-4)}
+    .suspect-token {
+      width:42px;height:42px;border-radius:var(--radius-full);
+      display:flex;align-items:center;justify-content:center;
+      font-family:var(--font-head);font-weight:700;font-size:1rem;color:#fff;
+      margin-bottom:var(--space-3);
+    }
+    .suspect-name{font-family:var(--font-head);font-weight:600;font-size:.92rem;color:var(--parchment-400);margin-bottom:var(--space-2)}
+    .suspect-meta{font-family:var(--font-body);font-size:var(--fs-caption);color:var(--text-dim);display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap}
+    .suspect-dot{display:inline-block;width:10px;height:10px;border-radius:2px;flex-shrink:0}
+    .suspect-stamp{margin-top:var(--space-3);font-family:var(--font-body);font-size:var(--fs-stamp);letter-spacing:.3em;text-transform:uppercase;color:var(--text-faint)}
+
+    /* ── Weapons ─────────────────────────────────────────── */
+    .weapon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:var(--space-4)}
+    .weapon-card {
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:var(--radius-dossier);padding:var(--space-4) var(--space-4);
+      display:flex;align-items:center;gap:var(--space-3);
+      transition:transform var(--dur-base),border-color var(--dur-base);
+    }
+    .weapon-card:hover{transform:translateY(-2px);border-color:var(--border-hi)}
+    .weapon-icon{font-size:1.7rem}
+    .weapon-name{font-family:var(--font-head);font-size:.88rem;color:var(--text)}
+    .weapon-id{font-family:var(--font-body);font-size:var(--fs-stamp);color:var(--text-dim)}
+
+    /* ── Rooms ───────────────────────────────────────────── */
+    .room-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:var(--space-4)}
+    .room-card{border:1px solid var(--border);border-radius:var(--radius-dossier);overflow:hidden;transition:transform var(--dur-base)}
+    .room-card:hover{transform:translateY(-2px)}
+    .room-color{height:76px;position:relative;display:flex;align-items:flex-end;padding:var(--space-2) var(--space-3)}
+    .room-name-over{font-family:var(--font-head);font-style:italic;font-size:var(--fs-caption);color:rgba(232,210,180,.6)}
+    .room-info{background:var(--card);padding:var(--space-2) var(--space-3);border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+    .room-name{font-family:var(--font-head);font-size:var(--fs-mono);color:var(--text)}
+    .room-hex{font-family:var(--font-body);font-size:var(--fs-stamp);color:var(--text-dim)}
+
+    /* ── Envelope ────────────────────────────────────────── */
+    .envelope-motif {
+      display:inline-flex;align-items:center;gap:var(--space-5);
+      padding:var(--space-5) var(--space-6);background:var(--card);
+      border:1px solid var(--border);border-top:2px solid var(--gold-dim);
+      border-radius:var(--radius-dossier);box-shadow:var(--shadow-md),var(--elev-gold);
+    }
+    .envelope-icon{font-size:2.4rem}
+    .envelope-text{font-family:var(--font-head);font-size:.92rem;font-style:italic;color:var(--text-dim)}
+    .envelope-text strong{color:var(--gold);font-style:normal}
+
+    /* ═══════════════════════════════════════════════════════
+       COMPONENTS
+       ═══════════════════════════════════════════════════════ */
+
+    /* ── Buttons ─────────────────────────────────────────── */
+    .btn-showcase{display:flex;flex-wrap:wrap;gap:var(--space-5);align-items:flex-end}
+    .btn-item{display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-2)}
+    .btn-item-label{font-family:var(--font-body);font-size:var(--fs-stamp);color:var(--text-dim);letter-spacing:.15em;text-transform:uppercase}
+    .btn {
+      cursor:pointer;border:none;font-family:var(--font-head);font-size:.85rem;font-weight:600;
+      letter-spacing:.07em;padding:.5rem 1.1rem;border-radius:var(--radius-sm);
+      transition:all var(--dur-base) var(--ease-snappy);
+      display:inline-flex;align-items:center;gap:var(--space-2);white-space:nowrap;
+    }
+    .btn:hover{transform:translateY(-1px)} .btn:active{transform:translateY(0)}
+    .btn-primary{background:linear-gradient(135deg,var(--gold-700),var(--gold-500));color:#0a0810;box-shadow:var(--shadow-sm)}
+    .btn-primary:hover{background:linear-gradient(135deg,var(--gold-600),var(--gold-400));box-shadow:var(--shadow-md),0 0 20px rgba(var(--gold-rgb),.25)}
+    .btn-secondary{background:var(--surface);color:var(--text-dim);border:1px solid var(--border);font-family:var(--font-body)}
+    .btn-secondary:hover{color:var(--text);border-color:var(--border-hi);background:var(--card)}
+    .btn-danger{background:rgba(154,31,31,.15);color:#f0a0a0;border:1px solid var(--crimson)}
+    .btn-danger:hover{background:rgba(154,31,31,.28);color:#f8b8b8;box-shadow:0 0 16px rgba(154,31,31,.3)}
+    .btn-resume{background:rgba(45,122,80,.15);color:#6ddfaa;border:1px solid var(--success)}
+    .btn-resume:hover{background:rgba(45,122,80,.28)}
+    .btn-icon {
+      background:transparent;color:var(--text-dim);border:1px solid var(--border);
+      width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center;
+      border-radius:var(--radius-md);font-size:1rem;
+    }
+    .btn-icon:hover{color:var(--gold);border-color:var(--gold-dim);background:var(--gold-faint)}
+    .btn-advance {
+      background:linear-gradient(135deg,rgba(var(--gold-rgb),.15),rgba(var(--gold-rgb),.08));
+      color:var(--gold-400);border:1px solid var(--gold-dim);
+      animation:reachablePulse 2s ease-in-out infinite;
+    }
+
+    /* ── Dossier cards ───────────────────────────────────── */
+    .dossier-card {
+      background:var(--card);border:1px solid var(--border);
+      border-top:2px solid var(--gold-dim);border-radius:var(--radius-dossier);
+      box-shadow:var(--shadow-md),var(--shadow-in);position:relative;overflow:hidden;max-width:480px;
+    }
+    .dossier-card::before {
+      content:'ARQUIVO CONFIDENCIAL';position:absolute;top:0;left:0;right:0;text-align:center;
+      font-family:var(--font-body);font-size:var(--fs-stamp);letter-spacing:.3em;text-transform:uppercase;
+      color:var(--gold-dim);background:rgba(var(--gold-rgb),.04);
+      border-bottom:1px solid rgba(var(--gold-rgb),.12);padding:3px 0;
+    }
+    .dossier-body{padding:calc(var(--space-5) + 18px) var(--space-5) var(--space-5)}
+    .dossier-title{font-family:var(--font-head);font-size:var(--fs-h2);color:var(--text);margin-bottom:var(--space-2)}
+    .dossier-meta{font-family:var(--font-body);font-size:var(--fs-caption);color:var(--text-dim);margin-bottom:var(--space-4)}
+    .dossier-field{display:flex;gap:var(--space-3);margin-bottom:var(--space-2);font-family:var(--font-body);font-size:var(--fs-body)}
+    .dossier-field-label{color:var(--text-dim);min-width:90px;flex-shrink:0}
+    .dossier-field-value{color:var(--text)}
+    .rules-inline-demo {
+      background:var(--surface);border:1px solid var(--border);
+      border-left:3px solid var(--gold-dim);border-radius:0 6px 6px 0;
+      padding:var(--space-4) var(--space-5);max-width:400px;
+    }
+    .rules-inline-demo ul{list-style:none;padding:0}
+    .rules-inline-demo li{font-family:var(--font-body);font-size:var(--fs-body);color:var(--text-dim);padding:var(--space-1) 0;display:flex;gap:var(--space-2)}
+    .rules-inline-demo li::before{content:'·';color:var(--gold-dim);flex-shrink:0}
+
+    /* ── Suggestion overlay (2-col) ─────────────────────── */
+    .sug-overlay-demo {
+      background:var(--card);border:1px solid var(--border);border-top:3px solid var(--gold);
+      border-radius:var(--radius-dossier);box-shadow:var(--shadow-lg),var(--elev-gold);
+      display:grid;grid-template-columns:1fr 1fr;overflow:hidden;
+    }
+    .sug-left{padding:var(--space-5);position:relative}
+    .sug-left::before {
+      content:'?';position:absolute;left:var(--space-4);top:50%;transform:translateY(-50%);
+      font-family:var(--font-head);font-size:8rem;line-height:1;
+      color:rgba(var(--gold-rgb),.025);pointer-events:none;font-style:italic;
+    }
+    .sug-left::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(var(--gold-rgb),.3),transparent)}
+    .sug-right{padding:var(--space-5);border-left:1px solid var(--border)}
+    .sug-title{font-family:var(--font-head);font-size:var(--fs-h3);font-weight:600;color:var(--text);margin-bottom:var(--space-4)}
+    .sug-suggester{display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) var(--space-3);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:var(--space-4)}
+    .sug-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--space-2);margin-bottom:var(--space-4)}
+    .sug-card-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-2) var(--space-3);text-align:center}
+    .sug-card-type{font-family:var(--font-body);font-size:var(--fs-stamp);color:var(--text-dim);margin-bottom:2px}
+    .sug-card-val{font-family:var(--font-head);font-size:var(--fs-stamp);color:var(--text)}
+    .sug-disprove-row{display:flex;align-items:center;gap:var(--space-3);padding:var(--space-1) 0;font-family:var(--font-body);font-size:var(--fs-caption);color:var(--text)}
+    .sug-disprove-row .status{margin-left:auto;font-size:.8rem}
+    .sug-status-pass{color:#555} .sug-status-check{color:var(--success-400)} .sug-status-cross{color:#c22828}
+    .sug-verdict{font-family:var(--font-body);font-size:var(--fs-body);color:var(--success-400);margin-top:var(--space-4);margin-bottom:var(--space-3)}
+    .sug-right-label{font-family:var(--font-head);font-style:italic;font-size:var(--fs-mono);color:var(--gold);margin-bottom:var(--space-3)}
+    /* Danger modal */
+    .modal-danger-demo {
+      background:var(--card);border:1px solid var(--border);border-top:3px solid var(--crimson);
+      border-radius:var(--radius-dossier);box-shadow:var(--shadow-lg),var(--elev-crimson);max-width:460px;
+    }
+    .modal-head{padding:var(--space-4) var(--space-5);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:var(--space-3)}
+    .modal-head-title{font-family:var(--font-head);font-size:var(--fs-h3);color:var(--text)}
+    .modal-bd{padding:var(--space-4) var(--space-5)}
+    .modal-warn{font-family:var(--font-body);font-size:var(--fs-body);color:#f0a0a0;background:rgba(154,31,31,.12);border:1px solid rgba(154,31,31,.3);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);margin-bottom:var(--space-4)}
+    .modal-summary{display:flex;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-4)}
+    .modal-summary-item{padding:var(--space-2) var(--space-3);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);font-family:var(--font-head);font-size:var(--fs-caption);color:var(--text)}
+    .modal-footer{padding:var(--space-3) var(--space-5);border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:var(--space-3)}
+
+    /* ── Notebook ────────────────────────────────────────── */
+    .notebook-demo{background:var(--card);border:1px solid var(--border);border-top:2px solid var(--gold-dim);border-radius:var(--radius-dossier);overflow:auto}
+    .notebook-hd{padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--border);font-family:var(--font-head);font-size:var(--fs-mono);font-style:italic;color:var(--gold);letter-spacing:.05em}
+    .nb-table{width:100%;border-collapse:collapse;font-family:var(--font-body);font-size:var(--fs-caption)}
+    .nb-table th{padding:var(--space-2) var(--space-3);border:1px solid var(--border);font-weight:700;text-align:center}
+    .nb-table th.nb-card-col{text-align:left;color:var(--text-dim)}
+    .nb-table th.nb-player-col{font-family:var(--font-head);font-size:var(--fs-caption);min-width:52px}
+    .nb-table td{padding:var(--space-2) var(--space-3);border:1px solid var(--border)}
+    .nb-cat td{background:color-mix(in srgb,var(--gold-dim) 14%,var(--surface));font-family:var(--font-head);font-style:italic;color:var(--gold);font-size:var(--fs-caption)}
+    .nb-own{background:rgba(45,122,80,.1)}
+    .mark-cell{text-align:center;font-size:.8rem;cursor:pointer}
+    .mk-check{color:var(--success-400)} .mk-cross{color:var(--crimson-500)} .mk-unknown{color:var(--gold)} .mk-empty{color:var(--parchment-900)}
+    .nb-note{font-family:var(--font-body);font-size:var(--fs-stamp);color:var(--text-faint);padding:var(--space-2) var(--space-3);text-align:center}
+
+    /* ── Log ─────────────────────────────────────────────── */
+    .log-demo{background:var(--card);border:1px solid var(--border);border-top:2px solid var(--gold-dim);border-radius:var(--radius-dossier);overflow:hidden;max-width:560px}
+    .log-hd{padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--border);font-family:var(--font-head);font-size:var(--fs-mono);font-style:italic;color:var(--gold);letter-spacing:.05em}
+    .log-entry {
+      display:grid;grid-template-columns:26px 18px 1fr;gap:var(--space-2);
+      align-items:start;padding:var(--space-2) var(--space-3);
+      border-bottom:1px solid rgba(42,36,64,.5);font-family:var(--font-body);font-size:var(--fs-caption);
+      border-left:3px solid transparent;
+    }
+    .log-entry:last-child{border-bottom:none}
+    .log-suggestion{border-left-color:var(--gold-dim)}
+    .log-pass{border-left-color:#555}
+    .log-disprove{border-left-color:var(--success-400)}
+    .log-accusation{border-left-color:var(--crimson-500)}
+    .log-roll{border-left-color:var(--ink-500)}
+    .log-passage{border-left-color:var(--passage-violet)}
+    .log-num{color:var(--text-faint);text-align:right} .log-icon{text-align:center} .log-text{color:var(--text)}
+
+    /* ── Badges & Toasts ─────────────────────────────────── */
+    .badge-showcase{display:flex;flex-wrap:wrap;gap:var(--space-6);align-items:flex-start}
+    .badge-group{display:flex;flex-direction:column;gap:var(--space-2)}
+    .badge-group-label{font-family:var(--font-body);font-size:var(--fs-stamp);color:var(--text-faint);letter-spacing:.2em;text-transform:uppercase;margin-bottom:4px}
+    .player-list-row{display:flex;align-items:center;gap:var(--space-2);font-family:var(--font-body);font-size:var(--fs-body);color:var(--text)}
+    .pdot{width:22px;height:22px;border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:700;font-size:.65rem;color:#fff;flex-shrink:0}
+    .btag{font-family:var(--font-body);font-size:var(--fs-stamp);padding:1px 5px;border-radius:var(--radius-sm);letter-spacing:.1em}
+    .btag-human{background:rgba(var(--gold-rgb),.1);color:var(--gold-dim);border:1px solid rgba(var(--gold-rgb),.2)}
+    .btag-bot{background:rgba(74,63,106,.3);color:var(--text-dim);border:1px solid var(--border)}
+    .btag-elim{background:rgba(154,31,31,.12);color:#c06060;border:1px solid rgba(154,31,31,.3)}
+    .toast-demo{padding:var(--space-3) var(--space-4);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:var(--fs-caption);display:inline-flex;align-items:center;gap:var(--space-2)}
+    .toast-transport{background:var(--evidence-blue-bg);border:1px solid #3a6090;color:#9cd4f0}
+    .toast-passage{background:rgba(96,96,160,.12);border:1px solid var(--passage-violet);color:rgba(180,180,240,.9)}
+
+    /* ── Phase labels ────────────────────────────────────── */
+    .phase-grid{display:flex;flex-wrap:wrap;gap:var(--space-3)}
+    .phase-label{font-family:var(--font-body);font-size:var(--fs-caption);letter-spacing:.12em;text-transform:uppercase;padding:3px var(--space-3);border-radius:var(--radius-sm);border:1px solid var(--border)}
+    .phase-roll{color:var(--text-dim);border-color:var(--border)}
+    .phase-move{color:var(--gold-400);border-color:var(--gold-dim);background:var(--gold-faint)}
+    .phase-action{color:#9cd4f0;border-color:#3a6090;background:rgba(16,26,44,.6)}
+    .phase-disprove{color:var(--crimson-400);border-color:var(--crimson);background:rgba(154,31,31,.08)}
+    .phase-bot{color:var(--text-faint);border-color:var(--border);font-style:italic}
+
+    /* ── Principles ──────────────────────────────────────── */
+    .principles-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:var(--space-5);margin-bottom:var(--space-7)}
+    .principle-card{padding:var(--space-5);background:var(--surface);border:1px solid var(--border);border-top:2px solid var(--gold-dim);border-radius:var(--radius-dossier)}
+    .principle-num{font-family:var(--font-body);font-size:3rem;font-weight:700;color:rgba(var(--gold-rgb),.15);line-height:1;margin-bottom:var(--space-3)}
+    .principle-title{font-family:var(--font-head);font-size:var(--fs-h3);font-weight:600;color:var(--text);margin-bottom:var(--space-2)}
+    .principle-desc{font-family:var(--font-body);font-size:var(--fs-body);color:var(--text-dim);line-height:1.65}
+    .do-dont-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);margin-bottom:var(--space-7)}
+    @media(max-width:600px){.do-dont-grid{grid-template-columns:1fr}}
+    .do-list{padding:var(--space-5);border-radius:var(--radius-dossier);background:rgba(45,122,80,.07);border:1px solid rgba(45,122,80,.3)}
+    .dont-list{padding:var(--space-5);border-radius:var(--radius-dossier);background:rgba(154,31,31,.07);border:1px solid rgba(154,31,31,.3)}
+    .do-list-title{font-family:var(--font-head);font-size:var(--fs-h3);font-weight:700;color:var(--success-400);margin-bottom:var(--space-4)}
+    .dont-list-title{font-family:var(--font-head);font-size:var(--fs-h3);font-weight:700;color:var(--crimson-400);margin-bottom:var(--space-4)}
+    .dd-item{font-family:var(--font-body);font-size:var(--fs-body);color:var(--text);display:flex;align-items:flex-start;gap:var(--space-2);margin-bottom:var(--space-3);line-height:1.5}
+    .dd-item:last-child{margin-bottom:0}
+    .icon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:var(--space-3)}
+    .icon-row{display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) var(--space-3);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:var(--fs-body)}
+    .icon-row-icon{font-size:1.15rem;min-width:26px;text-align:center}
+    .icon-row-info{display:flex;flex-direction:column}
+    .icon-row-name{color:var(--text)}
+    .icon-row-desc{font-size:var(--fs-stamp);color:var(--text-dim)}
+
+    /* ── Footer ──────────────────────────────────────────── */
+    .ds-footer{border-top:1px solid var(--border);padding:var(--space-7) var(--space-5);text-align:center}
+    .ds-footer p{font-family:var(--font-body);font-size:var(--fs-caption);color:var(--text-faint);line-height:2}
+    .ds-footer strong{color:var(--gold-dim)}
+
+    /* ── Animations ──────────────────────────────────────── */
+    @keyframes heroFadeIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes stampFadeIn{from{opacity:0;transform:rotate(-12deg) scale(.8)}to{opacity:.85;transform:rotate(-12deg) scale(1)}}
+    @keyframes reachablePulse{0%,100%{box-shadow:0 0 0 0 rgba(var(--gold-rgb),.2)}50%{box-shadow:0 0 10px 3px rgba(var(--gold-rgb),.12)}}
+
+    @media(max-width:768px){
+      .ds-section{padding:var(--space-7) 0}
+      .hero-stamp{display:none}
+      .sug-overlay-demo{grid-template-columns:1fr}
+      .sug-right{border-left:none;border-top:1px solid var(--border)}
+      .type-row{flex-direction:column;gap:4px}
+      .type-specimen-text{white-space:normal}
+    }
+  </style>
+</head>
+<body>
+
+<nav class="ds-nav">
+  <div class="ds-nav-inner">
+    <span class="ds-nav-logo">🔍 DETETIVE</span>
+    <div class="ds-nav-sep"></div>
+    <ul class="ds-nav-links">
+      <li><a href="#cores">Cores</a></li>
+      <li><a href="#tipografia">Tipografia</a></li>
+      <li><a href="#espacamento">Espaçamento</a></li>
+      <li><a href="#motion">Motion</a></li>
+      <li><a href="#identidade">Identidade</a></li>
+      <li><a href="#componentes">Componentes</a></li>
+      <li><a href="#principios">Princípios</a></li>
+    </ul>
+  </div>
+</nav>
+
+<section class="ds-hero" id="hero">
+  <div class="hero-stamp">CONFIDENCIAL</div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Sistema de Design</p>
+    <h1 class="hero-title">DETETIVE</h1>
+    <p class="hero-sub"><em>Arquivo Confidencial Nº&nbsp;9</em></p>
+    <p class="hero-tagline">Noir · Gilded · Dossier · 1940s Murder Mystery</p>
+    <ul class="hero-nav">
+      <li><a href="#cores">Cores</a></li>
+      <li><a href="#tipografia">Tipografia</a></li>
+      <li><a href="#espacamento">Espaçamento &amp; Raio</a></li>
+      <li><a href="#motion">Motion</a></li>
+      <li><a href="#identidade">Identidade Temática</a></li>
+      <li><a href="#componentes">Componentes</a></li>
+      <li><a href="#principios">Princípios</a></li>
+    </ul>
+  </div>
+</section>
+
+<div class="ds-container">
+
+  <!-- ════════════════ 01 CORES ════════════════ -->
+  <section class="ds-section" id="cores">
+    <div class="ds-section-label">01 ── Fundamentos</div>
+    <h2 class="ds-heading">Cores</h2>
+    <hr class="ds-rule">
+    <p class="ds-desc">Paleta construída em quatro escalas — <strong>Ink</strong> (fundos e superfícies), <strong>Gold</strong> (acento único do dossiê), <strong>Crimson</strong> (perigo, acusação) e <strong>Parchment</strong> (texto, pergaminho). Cores de status completam o sistema.</p>
+    <div id="color-content"></div>
+  </section>
+
+  <!-- ════════════════ 02 TIPOGRAFIA ════════════════ -->
+  <section class="ds-section" id="tipografia">
+    <div class="ds-section-label">02 ── Fundamentos</div>
+    <h2 class="ds-heading">Tipografia</h2>
+    <hr class="ds-rule">
+    <p class="ds-desc">Duas famílias, dois mundos: <strong>Playfair Display</strong> traz o drama do teatro policial — alto contraste, itálico expressivo; <strong>Courier Prime</strong> é a máquina de escrever do arquivo — dossier, logs, dados. Nunca trocar por fontes genéricas.</p>
+
+    <div class="type-group">
+      <div class="type-family-label">Playfair Display — Titular, Ênfase, Botões CTA</div>
+      <div class="type-row">
+        <div class="type-meta"><span class="type-token">--fs-display</span><span class="type-size">clamp(2.4–4.8rem)</span></div>
+        <div class="type-specimen-text" style="font-family:var(--font-head);font-size:var(--fs-display);font-weight:700;color:var(--parchment-400);">O Crime foi Cometido</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><span class="type-token">--fs-h1</span><span class="type-size">clamp(1.6–2.6rem)</span></div>
+        <div class="type-specimen-text" style="font-family:var(--font-head);font-size:var(--fs-h1);font-weight:700;color:var(--parchment-400);">Suspeitos da Mansão</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><span class="type-token">--fs-h2</span><span class="type-size">clamp(1.2–1.6rem)</span></div>
+        <div class="type-specimen-text" style="font-family:var(--font-head);font-size:var(--fs-h2);font-weight:600;color:var(--parchment-400);">Evidências Coletadas</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><span class="type-token">--fs-h3</span><span class="type-size">1.1rem</span></div>
+        <div class="type-specimen-text" style="font-family:var(--font-head);font-size:var(--fs-h3);font-weight:600;color:var(--parchment-400);">Notas do Detetive</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><span class="type-token">italic body</span><span class="type-size">--fs-body + itálico</span></div>
+        <div class="type-specimen-text" style="font-family:var(--font-head);font-style:italic;font-size:var(--fs-body);color:var(--text-dim);">Ela entrou na biblioteca às onze da noite, segurando uma vela…</div>
+      </div>
+    </div>
+
+    <div class="type-group">
+      <div class="type-family-label">Courier Prime — Corpo, Logs, Dados, Labels</div>
+      <div class="type-row">
+        <div class="type-meta"><span class="type-token">--fs-body</span><span class="type-size">0.9rem</span></div>
+        <div class="type-specimen-text" style="font-family:var(--font-body);font-size:var(--fs-body);color:var(--text);">A investigação prossegue. Nenhum suspeito foi definitivamente eliminado ainda.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><span class="type-token">--fs-mono</span><span class="type-size">0.85rem</span></div>
+        <div class="type-specimen-text" style="font-family:var(--font-body);font-size:var(--fs-mono);color:var(--text-dim);">CASO Nº 9 · ARQUIVO CONFIDENCIAL · ACESSO RESTRITO</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><span class="type-token">--fs-caption</span><span class="type-size">0.72rem</span></div>
+        <div class="type-specimen-text" style="font-family:var(--font-body);font-size:var(--fs-caption);color:var(--text-dim);letter-spacing:.1em;">SUSPEITO · ARMA · CÔMODO · ENVELOPE</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><span class="type-token">--fs-stamp</span><span class="type-size">0.62rem</span></div>
+        <div class="type-specimen-text" style="font-family:var(--font-body);font-size:var(--fs-stamp);color:var(--text-faint);letter-spacing:.35em;">ARQUIVO CONFIDENCIAL · ACESSO NÍVEL 5</div>
+      </div>
+    </div>
+
+    <div class="type-specimen-combined">
+      <div class="tsc-sub">Caso Nº 9 · Mansão Scarlett</div>
+      <div class="tsc-heading">O Assassino no Escritório</div>
+      <p class="tsc-body">Uma noite de tempestade castigou a mansão. O Cel.&nbsp;Mostarda foi visto perto da biblioteca antes da meia-noite. A Srta.&nbsp;Rosa nega qualquer envolvimento. O punhal está desaparecido desde o jantar e o mordomo confirma que a sala de bilhar estava trancada.</p>
+      <blockquote class="tsc-quote"><em>"O crime perfeito não existe — apenas o detetive imperfeito."</em></blockquote>
+    </div>
+  </section>
+
+  <!-- ════════════════ 03 ESPAÇAMENTO & RAIO ════════════════ -->
+  <section class="ds-section" id="espacamento">
+    <div class="ds-section-label">03 ── Fundamentos</div>
+    <h2 class="ds-heading">Espaçamento, Raio &amp; Elevação</h2>
+    <hr class="ds-rule">
+
+    <h3 class="ds-subheading" style="margin-top:0">Escala de Espaçamento</h3>
+    <div id="spacing-content"></div>
+
+    <h3 class="ds-subheading">Raio de Borda</h3>
+    <p class="ds-desc" style="margin-bottom:var(--space-5)">O <span class="token-chip">--radius-dossier</span> (<code>2px 2px 8px 8px</code>) é o motivo canônico do dossiê: topo afiado como papel, base arredondada. Usar em todos os cards de conteúdo.</p>
+    <div id="radius-content"></div>
+
+    <h3 class="ds-subheading">Elevação &amp; Sombras</h3>
+    <div class="elev-grid" id="elev-content"></div>
+  </section>
+
+  <!-- ════════════════ 04 MOTION ════════════════ -->
+  <section class="ds-section" id="motion">
+    <div class="ds-section-label">04 ── Fundamentos</div>
+    <h2 class="ds-heading">Motion</h2>
+    <hr class="ds-rule">
+    <p class="ds-desc">Três curvas de easing para três personalidades. <strong>Spring</strong> para feedback tátil (tokens, botões CTA). <strong>Dramático</strong> para entradas cênicas (modais, fim de jogo). <strong>Snappy</strong> para tudo que precisa de resposta imediata (menus, tabs). Passe o mouse para sentir.</p>
+
+    <div class="motion-grid">
+      <div class="motion-demo">
+        <div class="motion-label">Spring</div>
+        <div class="motion-token">--ease-spring · cubic-bezier(.34,1.56,.64,1)</div>
+        <div class="motion-stage"><div class="spring-ball"></div></div>
+        <div class="motion-hint">Hover → overshoot suave</div>
+      </div>
+      <div class="motion-demo">
+        <div class="motion-label">Dramático</div>
+        <div class="motion-token">--ease-dramatic · cubic-bezier(.22,1,.36,1)</div>
+        <div class="motion-stage"><div class="dramatic-card-demo">dossiê</div></div>
+        <div class="motion-hint">Hover → entrada teatral</div>
+      </div>
+      <div class="motion-demo">
+        <div class="motion-label">Snappy</div>
+        <div class="motion-token">--ease-snappy · cubic-bezier(.4,0,.2,1)</div>
+        <div class="motion-stage"><button class="snappy-btn-demo">Resposta Imediata</button></div>
+        <div class="motion-hint">Hover → sem hesitação</div>
+      </div>
+    </div>
+
+    <table class="motion-table">
+      <thead><tr><th>Token</th><th>Valor</th><th>Uso</th></tr></thead>
+      <tbody>
+        <tr><td>--ease-spring</td><td>cubic-bezier(.34,1.56,.64,1)</td><td>Tokens, botões CTA, pop de entrada</td></tr>
+        <tr><td>--ease-dramatic</td><td>cubic-bezier(.22,1,.36,1)</td><td>Modais, fim de jogo, overlays</td></tr>
+        <tr><td>--ease-snappy</td><td>cubic-bezier(.4,0,.2,1)</td><td>Menus, tabs, micro-interações</td></tr>
+        <tr><td>--dur-fast</td><td>100ms</td><td>Hover, foco</td></tr>
+        <tr><td>--dur-base</td><td>150ms</td><td>Transição padrão de componente</td></tr>
+        <tr><td>--dur-slow</td><td>300ms</td><td>Spring, slides</td></tr>
+        <tr><td>--dur-cinematic</td><td>850ms</td><td>Entrada dramática, fim de partida</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ════════════════ 05 IDENTIDADE TEMÁTICA ════════════════ -->
+  <section class="ds-section" id="identidade">
+    <div class="ds-section-label">05 ── Identidade Temática</div>
+    <h2 class="ds-heading">Suspeitos, Armas &amp; Cômodos</h2>
+    <hr class="ds-rule">
+    <p class="ds-desc">As cores dos suspeitos são identidade primária — aparecem em tokens, caderno, log e painel de ação. Os cômodos têm tons atmosféricos únicos que reforçam a ambientação noir de cada espaço.</p>
+
+    <h3 class="ds-subheading" style="margin-top:0">Suspeitos</h3>
+    <div class="suspect-grid" id="suspect-content"></div>
+
+    <h3 class="ds-subheading">Armas</h3>
+    <div class="weapon-grid" id="weapon-content"></div>
+
+    <h3 class="ds-subheading">Cômodos</h3>
+    <div class="room-grid" id="room-content"></div>
+
+    <h3 class="ds-subheading">Envelope / Solução</h3>
+    <p class="ds-desc">O envelope confidencial contém a solução do crime — um suspeito, uma arma e um cômodo. Nunca revelado durante o jogo; revelado somente no fim.</p>
+    <div class="envelope-motif">
+      <span class="envelope-icon">📩</span>
+      <div class="envelope-text">
+        <strong>Envelope Confidencial</strong><br>
+        Contém: <strong>Assassino</strong> · <strong>Arma</strong> · <strong>Local</strong><br>
+        Revelado apenas no desfecho da investigação.
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════ 06 COMPONENTES ════════════════ -->
+  <section class="ds-section" id="componentes">
+    <div class="ds-section-label">06 ── Componentes</div>
+    <h2 class="ds-heading">Componentes</h2>
+    <hr class="ds-rule">
+
+    <!-- Buttons -->
+    <div class="comp-label">Botões</div>
+    <div class="demo-wrap">
+      <div class="btn-showcase">
+        <div class="btn-item">
+          <button class="btn btn-primary">Iniciar Investigação</button>
+          <span class="btn-item-label">btn-primary · CTA ouro</span>
+        </div>
+        <div class="btn-item">
+          <button class="btn btn-secondary">Cancelar</button>
+          <span class="btn-item-label">btn-secondary</span>
+        </div>
+        <div class="btn-item">
+          <button class="btn btn-danger">⚖️ Fazer Acusação</button>
+          <span class="btn-item-label">btn-danger · crimson</span>
+        </div>
+        <div class="btn-item">
+          <button class="btn btn-resume">▶ Retomar Partida</button>
+          <span class="btn-item-label">btn-resume · verde</span>
+        </div>
+        <div class="btn-item">
+          <button class="btn btn-advance">⏩ Avançar Turno</button>
+          <span class="btn-item-label">btn-advance · pulso</span>
+        </div>
+        <div class="btn-item">
+          <button class="btn btn-icon">✕</button>
+          <span class="btn-item-label">btn-icon</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dossier cards -->
+    <div class="comp-label">Cards Dossiê</div>
+    <div class="demo-wrap" style="display:flex;flex-wrap:wrap;gap:var(--space-5);align-items:flex-start">
+      <div class="dossier-card">
+        <div class="dossier-body">
+          <div class="dossier-title">Nome do Detetive</div>
+          <div class="dossier-meta">Caso Nº 9 · 6 jogadores · Dificuldade: 🧠 Difícil</div>
+          <div class="dossier-field"><span class="dossier-field-label">Personagem</span><span class="dossier-field-value">Srta. Rosa</span></div>
+          <div class="dossier-field"><span class="dossier-field-label">Posição</span><span class="dossier-field-value">📍 Biblioteca</span></div>
+          <div class="dossier-field"><span class="dossier-field-label">Status</span><span class="dossier-field-value" style="color:var(--success-400)">Em jogo ★</span></div>
+          <div style="margin-top:var(--space-4)"><button class="btn btn-primary">Iniciar Investigação</button></div>
+        </div>
+      </div>
+
+      <div class="rules-inline-demo">
+        <div style="font-family:var(--font-head);font-size:var(--fs-h3);color:var(--text);margin-bottom:var(--space-3)">Como Jogar</div>
+        <ul>
+          <li>Role os dados e mova seu token pelo tabuleiro.</li>
+          <li>Dentro de um cômodo, faça uma suposição.</li>
+          <li>Rivais tentam desmentir com suas cartas.</li>
+          <li>Use o caderno para deduzir o crime.</li>
+          <li>Quando tiver certeza, faça a acusação.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Suggestion overlay -->
+    <div class="comp-label">Overlay de Suposição (2 colunas)</div>
+    <div class="demo-wrap">
+      <div class="sug-overlay-demo">
+        <div class="sug-left">
+          <div class="sug-title">🔍 Suposição Registrada</div>
+          <div class="sug-suggester">
+            <div class="pdot" style="background:var(--suspect-1)">CM</div>
+            <span style="font-family:var(--font-head);font-size:.9rem;color:var(--text)">Cel. Mostarda sugeriu:</span>
+          </div>
+          <div class="sug-cards">
+            <div class="sug-card-item"><div class="sug-card-type">🕵 Suspeito</div><div class="sug-card-val">Dona Violeta</div></div>
+            <div class="sug-card-item"><div class="sug-card-type">🔪 Arma</div><div class="sug-card-val">Revólver</div></div>
+            <div class="sug-card-item"><div class="sug-card-type">🏠 Local</div><div class="sug-card-val">Biblioteca</div></div>
+          </div>
+          <div style="font-family:var(--font-body);font-size:var(--fs-caption);color:var(--text-dim);margin-bottom:var(--space-3);letter-spacing:.1em;text-transform:uppercase">Verificação</div>
+          <div class="sug-disprove-row"><div class="pdot" style="background:var(--suspect-0)">SR</div> Srta. Rosa <span class="status sug-status-pass">✗</span></div>
+          <div class="sug-disprove-row"><div class="pdot" style="background:var(--suspect-2)">DV</div> Dona Violeta <span class="status sug-status-check">✓</span></div>
+          <div class="sug-disprove-row"><div class="pdot" style="background:var(--suspect-3)">SM</div> Sr. Marinho <span class="status sug-status-cross">–</span></div>
+          <div class="sug-verdict">✓ Dona Violeta desmentiu a suposição.</div>
+          <button class="btn btn-secondary">Continuar →</button>
+        </div>
+        <div class="sug-right">
+          <div class="sug-right-label">📓 Caderno de Campo</div>
+          <div class="notebook-demo" style="font-size:.7rem">
+            <table class="nb-table">
+              <thead>
+                <tr>
+                  <th class="nb-card-col">Carta</th>
+                  <th class="nb-player-col" style="color:var(--gold)">Você ★</th>
+                  <th class="nb-player-col" style="color:var(--suspect-1)">CM 🤖</th>
+                  <th class="nb-player-col" style="color:var(--suspect-2)">DV 🤖</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="nb-cat"><td colspan="4">🕵 Suspeitos</td></tr>
+                <tr><td class="nb-card-name">Srta. Rosa</td><td class="mark-cell mk-check">✓</td><td class="mark-cell mk-cross">✗</td><td class="mark-cell mk-cross">✗</td></tr>
+                <tr class="nb-own"><td class="nb-card-name">Cel. Mostarda</td><td class="mark-cell mk-check">✓</td><td class="mark-cell mk-empty">·</td><td class="mark-cell mk-empty">·</td></tr>
+                <tr><td class="nb-card-name">Dona Violeta</td><td class="mark-cell mk-unknown">?</td><td class="mark-cell mk-empty">·</td><td class="mark-cell mk-check">✓</td></tr>
+                <tr class="nb-cat"><td colspan="4">🔪 Armas</td></tr>
+                <tr><td class="nb-card-name">Punhal</td><td class="mark-cell mk-cross">✗</td><td class="mark-cell mk-empty">·</td><td class="mark-cell mk-empty">·</td></tr>
+                <tr><td class="nb-card-name">Revólver</td><td class="mark-cell mk-empty">·</td><td class="mark-cell mk-empty">·</td><td class="mark-cell mk-empty">·</td></tr>
+              </tbody>
+            </table>
+            <div class="nb-note">Clique para ciclar: ✗ → ? → ✓ → ·</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Accusation modal -->
+    <div class="comp-label">Modal de Acusação (Danger)</div>
+    <div class="demo-wrap">
+      <div class="modal-danger-demo">
+        <div class="modal-head"><span>⚠️</span><span class="modal-head-title">Confirmar Acusação</span></div>
+        <div class="modal-bd">
+          <div class="modal-warn">Você só pode fazer uma acusação por partida. Se errar, será eliminado do jogo.</div>
+          <div class="modal-summary">
+            <div class="modal-summary-item">🕵 Dona Violeta</div>
+            <div class="modal-summary-item">🔪 Revólver</div>
+            <div class="modal-summary-item">🏠 Biblioteca</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary">Cancelar</button>
+          <button class="btn btn-danger">Confirmar — Abrir Envelope!</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notebook full -->
+    <div class="comp-label">Caderno de Anotações</div>
+    <div class="demo-wrap">
+      <div class="notebook-demo">
+        <div class="notebook-hd">📓 Caderno de Anotações</div>
+        <table class="nb-table">
+          <thead>
+            <tr>
+              <th class="nb-card-col">Carta</th>
+              <th class="nb-player-col" style="color:var(--gold)">Você ★</th>
+              <th class="nb-player-col" style="color:var(--suspect-0)">SR 🤖</th>
+              <th class="nb-player-col" style="color:var(--suspect-3)">SM 🤖</th>
+              <th class="nb-player-col" style="color:var(--suspect-5)">PB 🤖</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="nb-cat"><td colspan="5">🕵 Suspeitos</td></tr>
+            <tr class="nb-own"><td class="nb-card-name">Srta. Rosa</td><td class="mark-cell mk-check">✓</td><td class="mark-cell mk-cross">✗</td><td class="mark-cell mk-cross">✗</td><td class="mark-cell mk-cross">✗</td></tr>
+            <tr><td class="nb-card-name">Cel. Mostarda</td><td class="mark-cell mk-empty">·</td><td class="mark-cell mk-empty">·</td><td class="mark-cell mk-empty">·</td><td class="mark-cell mk-empty">·</td></tr>
+            <tr><td class="nb-card-name">Dona Violeta</td><td class="mark-cell mk-unknown">?</td><td class="mark-cell mk-empty">·</td><td class="mark-cell mk-empty">·</td><td class="mark-cell mk-check">✓</td></tr>
+            <tr><td class="nb-card-name">Sr. Marinho</td><td class="mark-cell mk-cross">✗</td><td class="mark-cell mk-empty">·</td><td class="mark-cell mk-cross">✗</td><td class="mark-cell mk-empty">·</td></tr>
+            <tr class="nb-cat"><td colspan="5">🔪 Armas</td></tr>
+            <tr class="nb-own"><td class="nb-card-name">Castiçal</td><td class="mark-cell mk-check">✓</td><td class="mark-cell mk-cross">✗</td><td class="mark-cell mk-cross">✗</td><td class="mark-cell mk-cross">✗</td></tr>
+            <tr><td class="nb-card-name">Revólver</td><td class="mark-cell mk-empty">·</td><td class="mark-cell mk-empty">·</td><td class="mark-cell mk-check">✓</td><td class="mark-cell mk-empty">·</td></tr>
+            <tr><td class="nb-card-name">Corda</td><td class="mark-cell mk-cross">✗</td><td class="mark-cell mk-empty">·</td><td class="mark-cell mk-empty">·</td><td class="mark-cell mk-empty">·</td></tr>
+            <tr class="nb-cat"><td colspan="5">🏠 Cômodos</td></tr>
+            <tr><td class="nb-card-name">Biblioteca</td><td class="mark-cell mk-empty">·</td><td class="mark-cell mk-empty">·</td><td class="mark-cell mk-empty">·</td><td class="mark-cell mk-empty">·</td></tr>
+            <tr class="nb-own"><td class="nb-card-name">Escritório</td><td class="mark-cell mk-check">✓</td><td class="mark-cell mk-cross">✗</td><td class="mark-cell mk-cross">✗</td><td class="mark-cell mk-cross">✗</td></tr>
+          </tbody>
+        </table>
+        <div class="nb-note">Clique para ciclar: ✗ → ? → ✓ → ·</div>
+      </div>
+    </div>
+
+    <!-- Log -->
+    <div class="comp-label">Registro de Jogo</div>
+    <div class="demo-wrap">
+      <div class="log-demo">
+        <div class="log-hd">📋 Registro da Partida</div>
+        <div class="log-entry log-roll"><span class="log-num">#1</span><span class="log-icon">🎲</span><span class="log-text">Srta. Rosa rolou os dados: 3 + 4 = <strong>7</strong></span></div>
+        <div class="log-entry log-roll"><span class="log-num">#2</span><span class="log-icon">🚪</span><span class="log-text">Srta. Rosa entrou na <strong>Biblioteca</strong></span></div>
+        <div class="log-entry log-suggestion"><span class="log-num">#3</span><span class="log-icon">🔍</span><span class="log-text">Srta. Rosa sugeriu: Dona Violeta, Revólver, Biblioteca</span></div>
+        <div class="log-entry log-pass"><span class="log-num">#4</span><span class="log-icon">🤷</span><span class="log-text">Cel. Mostarda passou — sem cartas relevantes</span></div>
+        <div class="log-entry log-disprove"><span class="log-num">#5</span><span class="log-icon">🃏</span><span class="log-text">Dona Violeta desmentiu a suposição (carta revelada)</span></div>
+        <div class="log-entry log-passage"><span class="log-num">#6</span><span class="log-icon">🔐</span><span class="log-text">Prof. Black usou passagem secreta → Cozinha</span></div>
+        <div class="log-entry log-accusation"><span class="log-num">#7</span><span class="log-icon">⚖️</span><span class="log-text">Sr. Marinho fez uma acusação!</span></div>
+      </div>
+    </div>
+
+    <!-- Badges & Toasts -->
+    <div class="comp-label">Emblemas de Jogador &amp; Toasts</div>
+    <div class="demo-wrap">
+      <div class="badge-showcase">
+        <div class="badge-group">
+          <span class="badge-group-label">Jogadores</span>
+          <div class="player-list-row"><div class="pdot" style="background:var(--suspect-0)">SR</div> Srta. Rosa <span class="btag btag-human">★ Você</span></div>
+          <div class="player-list-row"><div class="pdot" style="background:var(--suspect-1)">CM</div> Cel. Mostarda <span class="btag btag-bot">🤖 Bot</span></div>
+          <div class="player-list-row"><div class="pdot" style="background:var(--suspect-2);opacity:.5">DV</div> <span style="color:var(--text-dim)">Dona Violeta</span> <span class="btag btag-elim">❌ Eliminado</span></div>
+          <div class="player-list-row"><div class="pdot" style="background:var(--suspect-3)">SM</div> Sr. Marinho <span class="btag btag-bot">🤖 Bot</span></div>
+        </div>
+        <div class="badge-group">
+          <span class="badge-group-label">Toasts</span>
+          <div class="toast-demo toast-transport">⚡ Você foi trazido para a Sala de Jantar</div>
+          <div class="toast-demo toast-passage" style="margin-top:var(--space-2)">🔐 Passagem secreta: Cozinha → Escritório</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase labels -->
+    <div class="comp-label">Labels de Fase</div>
+    <div class="demo-wrap">
+      <div class="phase-grid">
+        <span class="phase-label phase-roll">🎲 Fase: Rolar</span>
+        <span class="phase-label phase-move">🚶 Fase: Mover</span>
+        <span class="phase-label phase-action">🔍 Fase: Ação</span>
+        <span class="phase-label phase-disprove">⚠️ Fase: Desmentir</span>
+        <span class="phase-label phase-bot">🤔 Bot está pensando…</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════ 07 PRINCÍPIOS ════════════════ -->
+  <section class="ds-section" id="principios">
+    <div class="ds-section-label">07 ── Princípios &amp; Voz</div>
+    <h2 class="ds-heading">Princípios de Design</h2>
+    <hr class="ds-rule">
+
+    <div class="principles-grid">
+      <div class="principle-card">
+        <div class="principle-num">01</div>
+        <div class="principle-title">Noir sem Generic</div>
+        <div class="principle-desc">Preto-arroxeado + ouro + crimson + pergaminho. Nunca cinza neutro ou branco puro. A escuridão é atmosfera, não falta de cor.</div>
+      </div>
+      <div class="principle-card">
+        <div class="principle-num">02</div>
+        <div class="principle-title">Dossiê como Metáfora</div>
+        <div class="principle-desc">Todo card de conteúdo é um documento de caso. Topo afiado + base arredondada + carimbo "ARQUIVO CONFIDENCIAL". O raio assimétrico é inviolável.</div>
+      </div>
+      <div class="principle-card">
+        <div class="principle-num">03</div>
+        <div class="principle-title">Ouro = Ação Principal</div>
+        <div class="principle-desc">Gold aponta para o que o jogador deve fazer agora. Crimson aponta para perigo. Nunca usar gold como decoração genérica — ele tem peso semântico.</div>
+      </div>
+      <div class="principle-card">
+        <div class="principle-num">04</div>
+        <div class="principle-title">Tipografia Teatral</div>
+        <div class="principle-desc">Playfair Display em itálico é a assinatura dramática do jogo. Courier Prime é o arquivo. Nunca trocar por fontes system ou sans-serif genérico.</div>
+      </div>
+      <div class="principle-card">
+        <div class="principle-num">05</div>
+        <div class="principle-title">Motion com Intenção</div>
+        <div class="principle-desc">Spring para feedback tátil imediato. Dramático para revelações. Snappy para navegação. Nunca animar por animar — cada easing tem um papel.</div>
+      </div>
+      <div class="principle-card">
+        <div class="principle-num">06</div>
+        <div class="principle-title">Identidade dos Suspeitos</div>
+        <div class="principle-desc">As 6 cores dos suspeitos são canônicas. Nunca alterar, nunca usar fora de contexto. São a linguagem visual de identidade do jogo.</div>
+      </div>
+    </div>
+
+    <h3 class="ds-subheading">Do &amp; Don't</h3>
+    <div class="do-dont-grid">
+      <div class="do-list">
+        <div class="do-list-title">✓ Fazer</div>
+        <div class="dd-item"><span style="color:var(--success-400)">✓</span>Usar <code>--radius-dossier</code> em todos os cards de conteúdo.</div>
+        <div class="dd-item"><span style="color:var(--success-400)">✓</span>Playfair Display em itálico para citações e ênfase narrativa.</div>
+        <div class="dd-item"><span style="color:var(--success-400)">✓</span>Aplicar gold apenas em elementos de ação ou destaque semântico.</div>
+        <div class="dd-item"><span style="color:var(--success-400)">✓</span>Usar <code>--gold-rgb</code> (o canônico) para construir glows com <code>rgba()</code>.</div>
+        <div class="dd-item"><span style="color:var(--success-400)">✓</span>Usar a cor do suspeito via <code>--suspect-N</code> (não hardcode).</div>
+      </div>
+      <div class="dont-list">
+        <div class="dont-list-title">✗ Não Fazer</div>
+        <div class="dd-item"><span style="color:var(--crimson-400)">✗</span>Hardcode de cores fora dos tokens — sempre usar variáveis CSS.</div>
+        <div class="dd-item"><span style="color:var(--crimson-400)">✗</span>Usar Inter, Roboto, Arial ou fontes system no lugar das famílias tipográficas do sistema.</div>
+        <div class="dd-item"><span style="color:var(--crimson-400)">✗</span>Usar gold como cor decorativa sem função semântica.</div>
+        <div class="dd-item"><span style="color:var(--crimson-400)">✗</span>Aplicar border-radius genérico (8px uniforme) em cards — o dossiê tem raio assimétrico.</div>
+        <div class="dd-item"><span style="color:var(--crimson-400)">✗</span>Criar novos valores de ouro fora da escala gold-700→300.</div>
+      </div>
+    </div>
+
+    <h3 class="ds-subheading">Inventário de Ícones (Emoji)</h3>
+    <p class="ds-desc">O sistema de ícones é 100% emoji. Nenhum SVG customizado ou icon font necessário.</p>
+    <div class="icon-grid" id="icon-content"></div>
+  </section>
+
+</div><!-- /.ds-container -->
+
+<footer class="ds-footer">
+  <div class="ds-container">
+    <p><strong>DETETIVE — Sistema de Design</strong> · Arquivo Confidencial Nº&nbsp;9</p>
+    <p>Tokens fonte da verdade: <strong>src/styles/tokens.css</strong> · Estilos do app: <strong>src/styles/index.css</strong></p>
+    <p style="margin-top:var(--space-3)">🔍 &nbsp; <em>O crime perfeito não existe — apenas o detetive imperfeito.</em></p>
+  </div>
+</footer>
+
+<script>
+// ── Data ────────────────────────────────────────────────
+const colorGroups = [
+  {
+    label: 'Ink — Fundos &amp; Superfícies',
+    swatches: [
+      {hex:'#090810',token:'--ink-950',role:'Fundo principal --bg'},
+      {hex:'#0f0d1a',token:'--ink-900',role:'Superfície --surface'},
+      {hex:'#16132a',token:'--ink-800',role:'Card --card'},
+      {hex:'#1e1b38',token:'--ink-700',role:'Card ativo --card-hi'},
+      {hex:'#2a2440',token:'--ink-600',role:'Borda --border'},
+      {hex:'#4a3f6a',token:'--ink-500',role:'Borda elevada --border-hi'},
+    ]
+  },
+  {
+    label: 'Gold — Acento do Dossiê',
+    swatches: [
+      {hex:'#8a6a30',token:'--gold-700',role:'Ouro apagado --gold-dim'},
+      {hex:'#b5893e',token:'--gold-600',role:'Ouro médio'},
+      {hex:'#d4a853',token:'--gold-500',role:'★ Ouro canônico --gold'},
+      {hex:'#e8be6a',token:'--gold-400',role:'Ouro claro hover'},
+      {hex:'#f0d090',token:'--gold-300',role:'Ouro palha'},
+    ]
+  },
+  {
+    label: 'Crimson — Perigo &amp; Acusação',
+    swatches: [
+      {hex:'#6b1515',token:'--crimson-700',role:'Crimson fundo'},
+      {hex:'#9a1f1f',token:'--crimson-600',role:'Base --crimson --danger'},
+      {hex:'#c22828',token:'--crimson-500',role:'Elevado --crimson-hi'},
+      {hex:'#e84040',token:'--crimson-400',role:'Brilhante'},
+    ]
+  },
+  {
+    label: 'Parchment — Texto',
+    swatches: [
+      {hex:'#3e3530',token:'--parchment-900',role:'Fantasma --text-faint'},
+      {hex:'#8a7a62',token:'--parchment-700',role:'Apagado --text-dim'},
+      {hex:'#dfd2bc',token:'--parchment-400',role:'★ Texto principal --text'},
+      {hex:'#f0e6d0',token:'--parchment-200',role:'Brilhante'},
+    ]
+  },
+  {
+    label: 'Status',
+    swatches: [
+      {hex:'#1d5236',token:'--success-700',role:'Sucesso fundo'},
+      {hex:'#2d7a50',token:'--success-500',role:'Sucesso --success'},
+      {hex:'#5cb888',token:'--success-400',role:'Sucesso claro'},
+      {hex:'#6aacf0',token:'--evidence-blue',role:'Azul evidência'},
+      {hex:'#6060a0',token:'--passage-violet',role:'Passagem secreta'},
+    ]
+  }
+];
+
+const suspects = [
+  {id:0,name:'Srta. Rosa',initials:'SR',color:'#c0392b',token:'--suspect-0'},
+  {id:1,name:'Cel. Mostarda',initials:'CM',color:'#e67e22',token:'--suspect-1'},
+  {id:2,name:'Dona Violeta',initials:'DV',color:'#8e44ad',token:'--suspect-2'},
+  {id:3,name:'Sr. Marinho',initials:'SM',color:'#27ae60',token:'--suspect-3'},
+  {id:4,name:'Dona Branca',initials:'DB',color:'#bdc3c7',token:'--suspect-4'},
+  {id:5,name:'Prof. Black',initials:'PB',color:'#2980b9',token:'--suspect-5'},
+];
+
+const weapons = [
+  {id:0,name:'Castiçal',icon:'🕯️'},
+  {id:1,name:'Punhal',icon:'🗡️'},
+  {id:2,name:'Revólver',icon:'🔫'},
+  {id:3,name:'Corda',icon:'🪢'},
+  {id:4,name:'Cano de Chumbo',icon:'🔩'},
+  {id:5,name:'Chave Inglesa',icon:'🔧'},
+];
+
+const rooms = [
+  {id:0,name:'Cozinha',color:'#2e1405',token:'--room-0'},
+  {id:1,name:'Salão de Baile',color:'#051526',token:'--room-1'},
+  {id:2,name:'Jardim de Inverno',color:'#082e18',token:'--room-2'},
+  {id:3,name:'Sala de Jantar',color:'#2e0808',token:'--room-3'},
+  {id:4,name:'Sala de Bilhar',color:'#100830',token:'--room-4'},
+  {id:5,name:'Biblioteca',color:'#1c1005',token:'--room-5'},
+  {id:6,name:'Sala de Estar',color:'#1c1200',token:'--room-6'},
+  {id:7,name:'Hall',color:'#031420',token:'--room-7'},
+  {id:8,name:'Escritório',color:'#101800',token:'--room-8'},
+];
+
+const spacing = [
+  {token:'--space-1',value:'4px'},{token:'--space-2',value:'8px'},
+  {token:'--space-3',value:'12px'},{token:'--space-4',value:'16px'},
+  {token:'--space-5',value:'24px'},{token:'--space-6',value:'32px'},
+  {token:'--space-7',value:'48px'},{token:'--space-8',value:'64px'},
+  {token:'--space-9',value:'96px'},
+];
+
+const radii = [
+  {token:'--radius-sm',css:'3px',label:'sm'},
+  {token:'--radius-md',css:'6px',label:'md'},
+  {token:'--radius-lg',css:'12px',label:'lg'},
+  {token:'--radius-xl',css:'20px',label:'xl'},
+  {token:'--radius-full',css:'50%',label:'full'},
+  {token:'--radius-dossier',css:'2px 2px 8px 8px',label:'dossier ★'},
+  {token:'--radius-dossier-lg',css:'2px 2px 12px 12px',label:'dossier-lg'},
+];
+
+const elevCards = [
+  {token:'--elev-1',shadow:'0 2px 8px rgba(0,0,0,.5)',desc:'Sutil — superfície leve'},
+  {token:'--elev-2',shadow:'0 4px 24px rgba(0,0,0,.7)',desc:'Médio — cards'},
+  {token:'--elev-3',shadow:'0 8px 48px rgba(0,0,0,.9)',desc:'Fundo — modais'},
+  {token:'--elev-gold',shadow:'0 0 32px rgba(212,168,83,.15)',desc:'Brilho dourado'},
+  {token:'--elev-crimson',shadow:'0 0 32px rgba(154,31,31,.25)',desc:'Brilho perigo'},
+];
+
+const icons = [
+  {icon:'🔍',name:'Detetive / Suposição',desc:'Título + ação principal'},
+  {icon:'🕵',name:'Suspeito',desc:'Categoria de carta'},
+  {icon:'🔪',name:'Arma',desc:'Categoria de carta'},
+  {icon:'🏠',name:'Cômodo',desc:'Categoria de carta'},
+  {icon:'📩',name:'Envelope',desc:'Solução / fim de jogo'},
+  {icon:'🎲',name:'Dados',desc:'Rolar / log de rolagem'},
+  {icon:'🚪',name:'Entrar cômodo',desc:'Movimento para sala'},
+  {icon:'👣',name:'Corredor',desc:'Movimento em corredor'},
+  {icon:'🔐',name:'Passagem secreta',desc:'Log de transporte'},
+  {icon:'🤷',name:'Passar',desc:'Sem carta p/ desmentir'},
+  {icon:'🃏',name:'Desmentir',desc:'Carta mostrada'},
+  {icon:'❓',name:'Ninguém desmentiu',desc:'Log resultado'},
+  {icon:'⚖️',name:'Acusação',desc:'Ação de acusar'},
+  {icon:'🏆',name:'Vitória',desc:'Acusação correta'},
+  {icon:'💀',name:'Eliminado / Derrota',desc:'Fim de jogo'},
+  {icon:'📓',name:'Caderno',desc:'Tab de anotações'},
+  {icon:'📋',name:'Registro',desc:'Tab de log'},
+  {icon:'⚡',name:'Transporte',desc:'Toast de transporte'},
+  {icon:'🤖',name:'Bot',desc:'Badge de bot'},
+  {icon:'★',name:'Humano',desc:'Badge do jogador real'},
+  {icon:'❌',name:'Eliminado',desc:'Badge status'},
+  {icon:'📍',name:'Posição',desc:'Localização no painel'},
+  {icon:'⚙',name:'Configurações',desc:'FAB do FloatingMenu'},
+  {icon:'👁',name:'Ver envelope',desc:'Debug dev-only'},
+  {icon:'😌',name:'Fácil',desc:'Dificuldade setup'},
+  {icon:'🎯',name:'Normal',desc:'Dificuldade setup'},
+  {icon:'🧠',name:'Difícil',desc:'Dificuldade setup'},
+];
+
+// ── Render ───────────────────────────────────────────────
+function el(tag, attrs, ...children) {
+  const e = document.createElement(tag);
+  Object.entries(attrs||{}).forEach(([k,v])=> k==='style'?Object.assign(e.style,v):k==='html'?e.innerHTML=v:e.setAttribute(k,v));
+  children.flat().forEach(c => c && e.append(typeof c==='string'?document.createTextNode(c):c));
+  return e;
+}
+
+// Colors
+const cc = document.getElementById('color-content');
+colorGroups.forEach(g => {
+  const group = el('div',{class:'color-group'});
+  group.append(el('div',{class:'color-group-label',html:g.label}));
+  const row = el('div',{class:'swatch-row'});
+  g.swatches.forEach(s => {
+    row.append(el('div',{class:'swatch'},[
+      el('div',{class:'swatch-color',style:{background:s.hex}}),
+      el('div',{class:'swatch-info'},[
+        el('div',{class:'swatch-name'},s.token),
+        el('div',{class:'swatch-hex'},s.hex),
+        el('div',{class:'swatch-role'},s.role),
+      ])
+    ]));
+  });
+  group.append(row);
+  cc.append(group);
+});
+
+// Spacing
+const sc = document.getElementById('spacing-content');
+const sg = el('div',{class:'spacing-grid'});
+spacing.forEach(s => {
+  const px = parseInt(s.value);
+  sg.append(el('div',{class:'spacing-row'},[
+    el('span',{class:'spacing-label'},s.token),
+    el('div',{class:'spacing-bar',style:{width:px+'px'}}),
+    el('span',{class:'spacing-value'},s.value),
+  ]));
+});
+sc.append(sg);
+
+// Radius
+const rc = document.getElementById('radius-content');
+const rg = el('div',{class:'radius-grid'});
+radii.forEach(r => {
+  const isSpecial = r.token.includes('dossier');
+  rg.append(el('div',{class:'radius-item'},[
+    el('div',{class:'radius-box',style:{borderRadius:r.css, background: isSpecial ? 'rgba(212,168,83,0.06)' : undefined, borderColor: isSpecial ? 'var(--gold-500)' : undefined}}),
+    el('div',{class:'radius-token'},r.label),
+    el('div',{class:'radius-value'},r.css),
+  ]));
+});
+rc.append(rg);
+
+// Elevation
+const ec = document.getElementById('elev-content');
+elevCards.forEach(e2 => {
+  ec.append(el('div',{class:'elev-card',style:{boxShadow:e2.shadow}},[
+    el('span',{class:'elev-card-label'},e2.token),
+    el('div',{class:'elev-card-desc'},e2.desc),
+  ]));
+});
+
+// Suspects
+const susc = document.getElementById('suspect-content');
+suspects.forEach(s => {
+  const card = el('div',{class:'suspect-card'});
+  card.append(el('div',{class:'suspect-head',style:{background:s.color}}));
+  const body = el('div',{class:'suspect-body'});
+  body.append(
+    el('div',{class:'suspect-token',style:{background:s.color}},s.initials),
+    el('div',{class:'suspect-name'},s.name),
+    el('div',{class:'suspect-meta'},[
+      el('span',{class:'suspect-dot',style:{background:s.color}}),
+      el('span',{},s.color),
+      el('span',{class:'token-chip'},s.token),
+    ]),
+    el('div',{class:'suspect-stamp'},'SUSPEITO')
+  );
+  card.append(body);
+  susc.append(card);
+});
+
+// Weapons
+const wepc = document.getElementById('weapon-content');
+weapons.forEach((w,i) => {
+  wepc.append(el('div',{class:'weapon-card'},[
+    el('span',{class:'weapon-icon'},w.icon),
+    el('div',{},[
+      el('div',{class:'weapon-name'},w.name),
+      el('div',{class:'weapon-id'},'arma-'+i),
+    ])
+  ]));
+});
+
+// Rooms
+const roomc = document.getElementById('room-content');
+rooms.forEach(r => {
+  roomc.append(el('div',{class:'room-card'},[
+    el('div',{class:'room-color',style:{background:r.color}},[
+      el('span',{class:'room-name-over'},r.name),
+    ]),
+    el('div',{class:'room-info'},[
+      el('span',{class:'room-name'},r.name),
+      el('span',{class:'room-hex'},r.token),
+    ]),
+  ]));
+});
+
+// Icons
+const ic = document.getElementById('icon-content');
+icons.forEach(i => {
+  ic.append(el('div',{class:'icon-row'},[
+    el('span',{class:'icon-row-icon'},i.icon),
+    el('div',{},[
+      el('div',{class:'icon-row-name'},i.name),
+      el('div',{class:'icon-row-desc'},i.desc),
+    ])
+  ]));
+});
+</script>
+</body>
+</html>

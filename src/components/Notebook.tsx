@@ -101,7 +101,6 @@ export default function Notebook({ game, marks, setMarks }: Props) {
 
   return (
     <div className="notebook">
-      <h3>📓 Caderno de Anotações</h3>
       <div className="notebook-scroll">
         <table className="notebook-table">
           <thead>

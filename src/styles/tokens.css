@@ -1,0 +1,165 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   DETETIVE · tokens.css — Sistema de Design · Arquivo Confidencial Nº 9
+   Fonte única da verdade para todas as variáveis CSS.
+   Ordem: primitivos → aliases semânticos (app) → escalas novas → tokens temáticos
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Fontes (Google Fonts) ─────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap');
+
+:root {
+
+  /* ── PRIMITIVOS: Ink (fundos / superfícies) ──────────────────────────────── */
+  --ink-950: #090810;   /* bg — preto-arroxeado, quase noite */
+  --ink-900: #0f0d1a;   /* surface */
+  --ink-800: #16132a;   /* card */
+  --ink-700: #1e1b38;   /* card hover / ativo */
+  --ink-600: #2a2440;   /* border padrão */
+  --ink-500: #4a3f6a;   /* border elevado / focus */
+
+  /* ── PRIMITIVOS: Gold ───────────────────────────────────────────────────── */
+  --gold-700: #8a6a30;
+  --gold-600: #b5893e;
+  --gold-500: #d4a853;  /* gold canônico — cor do dossiê */
+  --gold-400: #e8be6a;
+  --gold-300: #f0d090;
+  /* RGB do gold canônico — único triplet autorizado (resolve conflito 212,168,83 vs 212,175,55) */
+  --gold-rgb: 212, 168, 83;
+
+  /* ── PRIMITIVOS: Crimson ────────────────────────────────────────────────── */
+  --crimson-700: #6b1515;
+  --crimson-600: #9a1f1f;   /* crimson base */
+  --crimson-500: #c22828;   /* crimson elevado */
+  --crimson-400: #e84040;
+
+  /* ── PRIMITIVOS: Parchment (texto) ─────────────────────────────────────── */
+  --parchment-900: #3e3530;   /* text-faint */
+  --parchment-700: #8a7a62;   /* text-dim */
+  --parchment-400: #dfd2bc;   /* text — pergaminho envelhecido */
+  --parchment-200: #f0e6d0;   /* text bright */
+
+  /* ── PRIMITIVOS: Status ─────────────────────────────────────────────────── */
+  --success-700: #1d5236;
+  --success-500: #2d7a50;
+  --success-400: #5cb888;
+  --evidence-blue:    #6aacf0;              /* azul evidência / transporte */
+  --evidence-blue-bg: rgba(16,26,44,0.95);
+  --passage-violet:   #6060a0;              /* roxo passagem secreta */
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     ALIASES SEMÂNTICOS — nomes que o app usa (valores preservados)
+     ══════════════════════════════════════════════════════════════════════════ */
+
+  --bg:         var(--ink-950);
+  --surface:    var(--ink-900);
+  --card:       var(--ink-800);
+  --card-hi:    var(--ink-700);
+  --border:     var(--ink-600);
+  --border-hi:  var(--ink-500);
+
+  --gold:       var(--gold-500);
+  --gold-dim:   var(--gold-700);
+  --gold-faint: rgba(var(--gold-rgb), 0.08);
+  --gold-glow:  rgba(var(--gold-rgb), 0.18);
+
+  --crimson:    var(--crimson-600);
+  --crimson-hi: var(--crimson-500);
+  --danger:     var(--crimson-600);
+
+  --text:       var(--parchment-400);
+  --text-dim:   var(--parchment-700);
+  --text-faint: var(--parchment-900);
+
+  --success: var(--success-500);
+
+  --font-head: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-body: 'Courier Prime', 'Courier New', Courier, monospace;
+
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.5);
+  --shadow-md: 0 4px 24px rgba(0,0,0,0.7);
+  --shadow-lg: 0 8px 48px rgba(0,0,0,0.9);
+  --shadow-in: inset 0 1px 0 rgba(255,255,255,0.03);
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     ESCALAS NOVAS — aditivas (não quebram código existente)
+     ══════════════════════════════════════════════════════════════════════════ */
+
+  /* Tipografia */
+  --fs-display:  clamp(2.4rem, 6vw, 4.8rem);
+  --fs-h1:       clamp(1.6rem, 4vw, 2.6rem);
+  --fs-h2:       clamp(1.2rem, 2.5vw, 1.6rem);
+  --fs-h3:       1.1rem;
+  --fs-body:     0.9rem;
+  --fs-mono:     0.85rem;
+  --fs-caption:  0.72rem;
+  --fs-stamp:    0.62rem;
+
+  /* Espaçamento */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  24px;
+  --space-6:  32px;
+  --space-7:  48px;
+  --space-8:  64px;
+  --space-9:  96px;
+
+  /* Raio de borda */
+  --radius-sm:         3px;
+  --radius-md:         6px;
+  --radius-lg:         12px;
+  --radius-xl:         20px;
+  --radius-full:       50%;
+  --radius-dossier:    2px 2px 8px 8px;    /* canônico: topo afiado, base arredondada */
+  --radius-dossier-lg: 2px 2px 12px 12px;
+
+  /* Elevação */
+  --elev-1:       0 2px 8px rgba(0,0,0,0.5);
+  --elev-2:       0 4px 24px rgba(0,0,0,0.7);
+  --elev-3:       0 8px 48px rgba(0,0,0,0.9);
+  --elev-gold:    0 0 32px rgba(var(--gold-rgb), 0.15);
+  --elev-crimson: 0 0 32px rgba(154,31,31,0.25);
+  --elev-in:      inset 0 1px 0 rgba(255,255,255,0.03);
+
+  /* Motion */
+  --ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);    /* overshoot suave */
+  --ease-dramatic: cubic-bezier(0.22, 1, 0.36, 1);        /* entrada teatral */
+  --ease-snappy:   cubic-bezier(0.4, 0, 0.2, 1);          /* material snappy */
+  --dur-fast:      100ms;
+  --dur-base:      150ms;
+  --dur-slow:      300ms;
+  --dur-cinematic: 850ms;
+
+  /* Z-index */
+  --z-board:    5;
+  --z-overlay:  20;
+  --z-modal:    100;
+  --z-menu:     299;
+  --z-fab:      300;
+  --z-scanline: 9999;
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     TOKENS TEMÁTICOS — identidade do jogo
+     ══════════════════════════════════════════════════════════════════════════ */
+
+  /* Suspeitos (canônico de cards.ts) */
+  --suspect-0: #c0392b;   /* Srta. Rosa     */
+  --suspect-1: #e67e22;   /* Cel. Mostarda  */
+  --suspect-2: #8e44ad;   /* Dona Violeta   */
+  --suspect-3: #27ae60;   /* Sr. Marinho    */
+  --suspect-4: #bdc3c7;   /* Dona Branca    */
+  --suspect-5: #2980b9;   /* Prof. Black    */
+
+  /* Cômodos (canônico de Board.tsx ROOM_BG) */
+  --room-0: #2e1405;   /* Cozinha           */
+  --room-1: #051526;   /* Salão de Baile    */
+  --room-2: #082e18;   /* Jardim de Inverno */
+  --room-3: #2e0808;   /* Sala de Jantar    */
+  --room-4: #100830;   /* Sala de Bilhar    */
+  --room-5: #1c1005;   /* Biblioteca        */
+  --room-6: #1c1200;   /* Sala de Estar     */
+  --room-7: #031420;   /* Hall              */
+  --room-8: #101800;   /* Escritório        */
+
+}
