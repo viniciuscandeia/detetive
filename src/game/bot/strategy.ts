@@ -3,13 +3,14 @@ import { envelopeCards, unknownCards, canAccuse, BotKnowledge } from './knowledg
 import { isSuspectCard, isWeaponCard, isRoomCard } from '../cards';
 import { ROOM_DEFS } from '../board';
 import { computeReachable, occupiedByOthers } from '../pathfinding';
+import { Rng } from '../rng';
 
 // ─── Accusation ────────────────────────────────────────────────────────────────
-export function botShouldAccuse(kb: BotKnowledge, diff: BotDifficulty): boolean {
+export function botShouldAccuse(kb: BotKnowledge, diff: BotDifficulty, rng: Rng): boolean {
   if (!canAccuse(kb)) return false;
-  if (diff === 'FACIL')  return Math.random() > 0.5;  // 50% hesitation
-  if (diff === 'NORMAL') return Math.random() > 0.1;  // 10% hesitation
-  return true;                                         // DIFICIL: accuse immediately
+  if (diff === 'FACIL')  return rng() > 0.5;  // 50% hesitation
+  if (diff === 'NORMAL') return rng() > 0.1;  // 10% hesitation
+  return true;                                 // DIFICIL: accuse immediately
 }
 
 export function botBuildAccusation(kb: BotKnowledge): {
@@ -25,17 +26,18 @@ export function botBuildAccusation(kb: BotKnowledge): {
 
 // ─── Suggestion ────────────────────────────────────────────────────────────────
 export function botChooseSuggestion(
-  kb:   BotKnowledge,
-  diff: BotDifficulty,
+  kb:      BotKnowledge,
+  diff:    BotDifficulty,
   _roomId: number,
+  rng:     Rng,
 ): { suspectId: number; weaponId: number } {
   const unknown = new Set(unknownCards(kb));
   const env     = envelopeCards(kb);
 
   // FACIL: random choice from valid suspects/weapons
   if (diff === 'FACIL') {
-    const s = Math.floor(Math.random() * 6);
-    const w = Math.floor(Math.random() * 6);
+    const s = Math.floor(rng() * 6);
+    const w = Math.floor(rng() * 6);
     return { suspectId: s, weaponId: w };
   }
 
@@ -58,13 +60,20 @@ function scoreRoom(roomId: number, kb: BotKnowledge): number {
   const unknown = new Set(unknownCards(kb));
   const env     = envelopeCards(kb);
   const rc      = 12 + roomId;
+
+  // Primary signal: is the room card itself informative?
   let score = 0;
-  if (unknown.has(rc)) score += 3;
-  else if (env.has(rc)) score += 1;
-  const s = [0,1,2,3,4,5].find(x => unknown.has(x) || env.has(x)) ?? 0;
-  const w = [0,1,2,3,4,5].find(x => unknown.has(6 + x) || env.has(6 + x)) ?? 0;
-  if (unknown.has(s) || env.has(s)) score += 1;
-  if (unknown.has(6 + w) || env.has(6 + w)) score += 1;
+  if (unknown.has(rc))      score += 3;   // room still unknown — high value
+  else if (env.has(rc))     score += 1;   // room confirmed in envelope — high value
+
+  // Secondary: any unknown suspects or weapons left to learn about?
+  // These are room-independent but raise the value of entering ANY room for a
+  // suggestion. Computed per call so they correctly reflect current knowledge.
+  const hasUnknownSuspect = [0,1,2,3,4,5].some(x => unknown.has(x));
+  const hasUnknownWeapon  = [0,1,2,3,4,5].some(x => unknown.has(6 + x));
+  if (hasUnknownSuspect) score += 1;
+  if (hasUnknownWeapon)  score += 1;
+
   return score;
 }
 

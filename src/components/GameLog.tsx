@@ -68,6 +68,11 @@ function formatEntry(e: LogEntry, players: Player[]): { icon: string; text: stri
         icon: '💀',
         text: `${playerName(players, e.playerIdx)} foi eliminado da investigação`,
       }
+    default:
+      return {
+        icon: '❓',
+        text: `[entrada desconhecida: ${(e as { type: string }).type}]`,
+      }
   }
 }
 

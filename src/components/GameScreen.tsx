@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import Board           from './Board'
 import ActionPanel     from './ActionPanel'
-import Notebook, { type MarksState } from './Notebook'
+import Notebook, { type MarksState, type PendingProp } from './Notebook'
 import GameLog         from './GameLog'
 import SuggestionModal from './SuggestionModal'
 import DisproveModal   from './DisproveModal'
@@ -33,8 +33,9 @@ export default function GameScreen({ api, onExit }: Props) {
   const { game, isHumanTurn } = api
   const [modal,      setModal]      = useState<'none' | 'suggest' | 'accuse'>('none')
   const [tab,        setTab]        = useState<Tab>('caderno')
-  const [sugOverlay, setSugOverlay] = useState<SugOverlay | null>(null)
-  const [marks,      setMarks]      = useState<MarksState>({})
+  const [sugOverlay,  setSugOverlay]  = useState<SugOverlay | null>(null)
+  const [marks,       setMarks]       = useState<MarksState>({})
+  const [pendingProp, setPendingProp] = useState<PendingProp | null>(null)
 
   const cp     = game.players[game.currentPlayerIdx]
   const canAct = game.phase === 'ACTION' && isHumanTurn
@@ -43,17 +44,18 @@ export default function GameScreen({ api, onExit }: Props) {
   // Close suggestion/accusation modal when phase leaves ACTION
   useEffect(() => {
     if (!canAct && modal !== 'none') setModal('none')
-  }, [canAct])
+  }, [canAct, modal])
 
   // Archive final log when game ends → ./logs/partida_TIMESTAMP.json
+  // Guard against StrictMode double-fire: track whether archive was already sent.
   useEffect(() => {
-    if (game.phase === 'GAME_OVER') {
-      saveLogToFile(game, true)
-        .then(r => { if (r.ok) console.info('[log archived]', r.file) })
-        .catch(() => { /* dev server not running */ })
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [game.phase])
+    if (game.phase !== 'GAME_OVER') return
+    let cancelled = false
+    saveLogToFile(game, true)
+      .then(r => { if (!cancelled && r.ok) console.info('[log archived]', r.file) })
+      .catch(() => { /* dev server not running */ })
+    return () => { cancelled = true }
+  }, [game.phase, game])
 
   // ── Overlay effect 1: detect new suggestion (bot OR human) ──────────────
   // Dep: game.suggestionSeq — fires on every new suggestion.
@@ -114,8 +116,7 @@ export default function GameScreen({ api, onExit }: Props) {
         ? { ...prev, stage: 'result', disproverIdx }
         : prev
     )
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [game.phase])
+  }, [game.phase, sugOverlay?.stage, game.currentSuggestion?.disproverIdx])
 
   // ── Handlers ─────────────────────────────────────────────────────────────
   function handleVerificar() {
@@ -215,7 +216,7 @@ export default function GameScreen({ api, onExit }: Props) {
         </div>
 
         <div className="side-panel side-panel--anim" key={tab}>
-          {tab === 'caderno'  && <Notebook game={game} marks={marks} setMarks={setMarks} />}
+          {tab === 'caderno'  && <Notebook game={game} marks={marks} setMarks={setMarks} pendingProp={pendingProp} onSetPendingProp={setPendingProp} />}
           {tab === 'registro' && <GameLog log={game.log} players={game.players} game={game} />}
         </div>
       </div>
@@ -294,8 +295,8 @@ export default function GameScreen({ api, onExit }: Props) {
                   <>
                     <p className="sug-section-label">Verificação</p>
                     <div className="sug-disprove-list">
-                      {getStatuses(sugOverlay).map(({ player, status }) => (
-                        <div key={player?.idx ?? Math.random()} className={`sug-disprove-row sug-ds-${status}`}>
+                      {getStatuses(sugOverlay).map(({ player, status }, i) => (
+                        <div key={player?.idx ?? i} className={`sug-disprove-row sug-ds-${status}`}>
                           <div
                             className="player-dot sm"
                             style={{ background: player ? SUSPECTS[player.suspectId].color : '#666' }}
@@ -343,7 +344,7 @@ export default function GameScreen({ api, onExit }: Props) {
             <div className="sug-right-col">
               <p className="sug-notebook-hint">Caderno de campo</p>
               <div className="sug-notebook-wrap">
-                <Notebook game={game} marks={marks} setMarks={setMarks} />
+                <Notebook game={game} marks={marks} setMarks={setMarks} pendingProp={pendingProp} onSetPendingProp={setPendingProp} />
               </div>
             </div>
 

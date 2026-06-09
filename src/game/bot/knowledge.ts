@@ -176,14 +176,28 @@ function propagate(kb: BotKnowledge): void {
       }
     }
 
-    // 2. Hand-size inference: if player p has exactly handSizes[p] HAS cards,
-    //    remaining UNKNOWN → NOT_HAS
+    // 2. Hand-size inference:
+    //    2a. If player p has exactly handSizes[p] HAS cards → remaining UNKNOWN become NOT_HAS
+    //    2b. If player p's remaining UNKNOWN count equals (handSizes[p] - hasCount)
+    //        → those UNKNOWN cards must be HAS (naked-single / positive dual)
     for (let p = 0; p < kb.numPlayers; p++) {
-      const hasCount = kb.matrix[p].filter(c => c === 'HAS').length;
-      if (hasCount === kb.handSizes[p]) {
+      const hasCount     = kb.matrix[p].filter(c => c === 'HAS').length;
+      const unknownCount = kb.matrix[p].filter(c => c === 'UNKNOWN').length;
+      const needed       = kb.handSizes[p] - hasCount;
+
+      if (needed === 0) {
+        // Rule 2a: hand is full — no more unknowns can be HAS
         for (let c = 0; c < 21; c++) {
           if (kb.matrix[p][c] === 'UNKNOWN') {
             kb.matrix[p][c] = 'NOT_HAS';
+            changed = true;
+          }
+        }
+      } else if (unknownCount > 0 && unknownCount === needed) {
+        // Rule 2b: exactly as many unknowns as slots left → all must be HAS
+        for (let c = 0; c < 21; c++) {
+          if (kb.matrix[p][c] === 'UNKNOWN') {
+            setHas(kb.matrix, p, c, kb.numPlayers);
             changed = true;
           }
         }

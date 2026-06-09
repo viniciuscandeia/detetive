@@ -371,15 +371,17 @@ export function doEndTurn(state: GameState): GameState {
   const wasTransported = s.pendingTransportPlayerIdx === next &&
     s.players[next].position.type === 'room';
 
-  s.currentPlayerIdx         = next;
-  s.diceRoll                 = null;
-  s.diceValues               = null;
-  s.reachable                = null;
-  s.currentSuggestion        = null;
-  s.humanDisproveOpts        = null;
-  s.hasSuggestedThisTurn     = false;
-  s.pendingTransportPlayerIdx = null;
-  s.arrivedByTransport       = wasTransported;
+  s.currentPlayerIdx     = next;
+  s.diceRoll             = null;
+  s.diceValues           = null;
+  s.reachable            = null;
+  s.currentSuggestion    = null;
+  s.humanDisproveOpts    = null;
+  s.hasSuggestedThisTurn = false;
+  // Only clear pendingTransportPlayerIdx when that player's turn actually arrives;
+  // otherwise a transported player who is not immediately next loses their benefit.
+  if (s.pendingTransportPlayerIdx === next) s.pendingTransportPlayerIdx = null;
+  s.arrivedByTransport = wasTransported;
   // Keep lastTransportedTo only if the incoming player is the one who was transported
   if (!wasTransported) s.lastTransportedTo = null;
   s.phase = 'ROLL';

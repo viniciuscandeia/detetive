@@ -54,7 +54,7 @@ describe('botBuildAccusation', () => {
 describe('botChooseSuggestion', () => {
   it('FACIL returns valid suspect (0-5) and weapon (0-5)', () => {
     const kb  = createBotKnowledge(0, [0, 6, 12], 3)
-    const res = botChooseSuggestion(kb, 'FACIL', 0)
+    const res = botChooseSuggestion(kb, 'FACIL', 0, makeRng(1))
     expect(res.suspectId).toBeGreaterThanOrEqual(0)
     expect(res.suspectId).toBeLessThanOrEqual(5)
     expect(res.weaponId).toBeGreaterThanOrEqual(0)
@@ -67,7 +67,7 @@ describe('botChooseSuggestion', () => {
     // Tell bot about suspect 1 (held by player 1)
     const kb2 = recordCardShown(kb, 1, 1)
     // Unknown suspects: 2,3,4,5 — bot should pick one of them
-    const res = botChooseSuggestion(kb2, 'NORMAL', 0)
+    const res = botChooseSuggestion(kb2, 'NORMAL', 0, makeRng(1))
     // suspectId should not be 0 (bot has it) or 1 (known held) if unknowns exist
     expect([2, 3, 4, 5]).toContain(res.suspectId)
   })
@@ -88,7 +88,7 @@ describe('botChooseSuggestion', () => {
       }
     }
     // The important thing: suggestion picks from envelope or unknown
-    const res = botChooseSuggestion(kb2, 'DIFICIL', 0)
+    const res = botChooseSuggestion(kb2, 'DIFICIL', 0, makeRng(1))
     expect(res.suspectId).toBeGreaterThanOrEqual(0)
   })
 })
@@ -98,7 +98,7 @@ describe('botShouldAccuse', () => {
   it('returns false if canAccuse is false', () => {
     const kb = createBotKnowledge(0, [0], 3)
     // canAccuse false → botShouldAccuse always false regardless of difficulty
-    expect(botShouldAccuse(kb, 'DIFICIL')).toBe(false)
+    expect(botShouldAccuse(kb, 'DIFICIL', makeRng(1))).toBe(false)
   })
 
   it('DIFICIL always accuses when canAccuse is true', () => {
@@ -117,7 +117,8 @@ describe('botShouldAccuse', () => {
 
     if (canAccuse(kb)) {
       // canAccuse → DIFICIL must always accuse
-      const results = Array.from({ length: 20 }, () => botShouldAccuse(kb, 'DIFICIL'))
+      const rng = makeRng(1)
+      const results = Array.from({ length: 20 }, () => botShouldAccuse(kb, 'DIFICIL', rng))
       expect(results.every(Boolean)).toBe(true)
     }
   })

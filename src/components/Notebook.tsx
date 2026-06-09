@@ -1,4 +1,4 @@
-import { useState, useEffect, Fragment } from 'react'
+import { useEffect, Fragment } from 'react'
 import { SUSPECTS, cardName } from '../game/cards'
 import type { GameState } from '../game/types'
 
@@ -6,18 +6,19 @@ export const MARKS = ['✗', '?', '✓', ''] as const
 export type Mark = typeof MARKS[number]
 export type MarksState = Record<number, Record<number, Mark>>
 
+export interface PendingProp { cardId: number; playerIdx: number }
+
 interface Props {
-  game:      GameState
-  marks:     MarksState
-  setMarks:  React.Dispatch<React.SetStateAction<MarksState>>
+  game:             GameState
+  marks:            MarksState
+  setMarks:         React.Dispatch<React.SetStateAction<MarksState>>
+  pendingProp:      PendingProp | null
+  onSetPendingProp: (p: PendingProp | null) => void
 }
 
-interface PendingProp { cardId: number; playerIdx: number }
-
-export default function Notebook({ game, marks, setMarks }: Props) {
+export default function Notebook({ game, marks, setMarks, pendingProp, onSetPendingProp }: Props) {
   const humanPlayer = game.players.find(p => !p.isBot)
   const n = game.players.length
-  const [pendingProp, setPendingProp] = useState<PendingProp | null>(null)
 
   // Auto-fill from game state
   useEffect(() => {
@@ -63,17 +64,15 @@ export default function Notebook({ game, marks, setMarks }: Props) {
   ])
 
   function cycleMark(cardId: number, playerIdx: number) {
-    setMarks(prev => {
-      const cur     = prev[cardId]?.[playerIdx] ?? ''
-      const nextIdx = MARKS.indexOf(cur as Mark)
-      const next    = MARKS[(nextIdx + 1) % MARKS.length]
-      const row     = { ...prev[cardId], [playerIdx]: next }
-      // Apply ✓ immediately but defer propagation — ask for confirmation
-      if (next === '✓') {
-        setPendingProp({ cardId, playerIdx })
-      }
-      return { ...prev, [cardId]: row }
-    })
+    // Read current mark before updater so we can set pendingProp outside the updater
+    const cur     = marks[cardId]?.[playerIdx] ?? ''
+    const nextIdx = MARKS.indexOf(cur as Mark)
+    const next    = MARKS[(nextIdx + 1) % MARKS.length]
+    setMarks(prev => ({ ...prev, [cardId]: { ...prev[cardId], [playerIdx]: next } }))
+    // Side effect outside updater — safe from StrictMode double-invoke
+    if (next === '✓') {
+      onSetPendingProp({ cardId, playerIdx })
+    }
   }
 
   function confirmProp() {
@@ -86,11 +85,11 @@ export default function Notebook({ game, marks, setMarks }: Props) {
       }
       return { ...prev, [cardId]: row }
     })
-    setPendingProp(null)
+    onSetPendingProp(null)
   }
 
   function cancelProp() {
-    setPendingProp(null)
+    onSetPendingProp(null)
   }
 
   const categories = [

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { SUSPECTS } from '../game/cards'
+import { SUSPECTS, WEAPONS, ROOMS } from '../game/cards'
 import type { GameAPI } from '../state/useGame'
 
 interface Props {
@@ -52,8 +52,8 @@ export default function FloatingMenu({ api, onExit }: Props) {
               <div className="debug-reveal fm-debug-reveal">
                 <strong>Envelope:</strong><br />
                 🕵 {SUSPECTS[game.envelope.suspectId].name}<br />
-                🔪 {['Castiçal','Punhal','Revólver','Corda','Cano de Chumbo','Chave Inglesa'][game.envelope.weaponId]}<br />
-                🏠 {['Cozinha','Salão de Baile','Jardim de Inverno','Sala de Jantar','Sala de Bilhar','Biblioteca','Sala de Estar','Hall','Escritório'][game.envelope.roomId]}
+                🔪 {WEAPONS[game.envelope.weaponId].name}<br />
+                🏠 {ROOMS[game.envelope.roomId].name}
               </div>
             )}
 

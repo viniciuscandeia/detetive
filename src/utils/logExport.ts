@@ -51,7 +51,9 @@ export async function saveLogToFile(
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify(payload, null, 2),
     })
-    if (res.ok) return res.json()
+    if (res.ok) {
+      try { return await res.json() } catch { return { ok: true } }
+    }
     return { ok: false }
   } catch {
     return { ok: false }
@@ -68,5 +70,6 @@ export function downloadLog(game: GameState): void {
   a.href     = url
   a.download = `partida_${ts}.json`
   a.click()
-  URL.revokeObjectURL(url)
+  // Delay revoke so the browser has time to initiate the download
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
 }

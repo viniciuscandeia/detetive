@@ -93,6 +93,7 @@ export function occupiedByOthers(
   const s = new Set<string>();
   for (const p of players) {
     if (p.idx === selfIdx) continue;
+    if (p.eliminated) continue;  // eliminated tokens don't block movement
     if (p.position.type === 'corridor') s.add(cellKey(p.position.row, p.position.col));
   }
   return s;

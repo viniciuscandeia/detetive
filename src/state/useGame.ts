@@ -19,7 +19,8 @@ const BOT_DELAYS: Record<string, number> = {
   DISPROVE: 500,
 };
 
-const SAVE_KEY = 'detetive_save_v2';
+const SAVE_KEY    = 'detetive_save_v2';
+const SAVE_KEY_BK = 'detetive_save_v2_bk';
 
 // ─── Slice state ──────────────────────────────────────────────────────────────
 interface St {
@@ -108,8 +109,28 @@ function loadGame(): GameState | null {
   } catch { return null; }
 }
 
+function saveBk(bk: Record<number, KB.BotKnowledge>): void {
+  try { localStorage.setItem(SAVE_KEY_BK, JSON.stringify(bk)); } catch { /* ignore quota errors */ }
+}
+
+function loadBk(): Record<number, KB.BotKnowledge> | null {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY_BK);
+    return raw ? JSON.parse(raw) as Record<number, KB.BotKnowledge> : null;
+  } catch { return null; }
+}
+
 function clearSave(): void {
-  try { localStorage.removeItem(SAVE_KEY); } catch { /* noop */ }
+  try {
+    localStorage.removeItem(SAVE_KEY);
+    localStorage.removeItem(SAVE_KEY_BK);
+  } catch { /* noop */ }
+}
+
+/** Public helper: returns true if a non-finished save exists. Avoids duplicating parse logic. */
+export function hasSavedGame(): boolean {
+  const g = loadGame();
+  return g !== null && g.phase !== 'GAME_OVER';
 }
 
 // ─── Reducer ──────────────────────────────────────────────────────────────────
@@ -207,11 +228,13 @@ function reducer(st: St, a: Action): St {
 function makeInitialState(): St {
   const saved = loadGame();
   if (saved && saved.phase !== 'GAME_OVER') {
-    return { game: saved, bk: buildBk(saved), botThinking: false };
+    // Restore bot knowledge from persisted save; fall back to fresh build if missing/corrupt.
+    const savedBk = loadBk() ?? buildBk(saved);
+    return { game: saved, bk: savedBk, botThinking: false };
   }
   const rng  = makeRng(1);
   const game = Engine.initGame(
-    { numPlayers: 3, humanName: 'Jogador', humanSuspectId: 0, botDifficulty: 'NORMAL' },
+    { numPlayers: 4, humanName: 'Detetive', humanSuspectId: 0, botDifficulty: 'NORMAL' },
     rng,
   );
   return { game, bk: buildBk(game), botThinking: false };
@@ -242,6 +265,11 @@ export function useGame() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [st.game.log.length]);
 
+  // Persist bot knowledge alongside game save so bots remember deductions on page reload
+  useEffect(() => {
+    if (st.game.phase !== 'GAME_OVER') saveBk(st.bk);
+  }, [st.bk, st.game.phase]);
+
   // Bot automation — depend on phase + currentPlayerIdx + humanDisproveOpts only
   useEffect(() => {
     clearTimer();
@@ -264,7 +292,7 @@ export function useGame() {
         if (game.arrivedByTransport) {
           // Bot decides: suggest here or roll out
           dispatch({ t: 'TRANSPORT_SUGGEST' });
-        } else if (Engine.canUseSecretPassage(game) && Math.random() < 0.5) {
+        } else if (Engine.canUseSecretPassage(game) && rngRef.current() < 0.5) {
           dispatch({ t: 'SECRET' });
         } else {
           dispatch({ t: 'ROLL', rng: rngRef.current });
@@ -291,14 +319,14 @@ export function useGame() {
       dispatch({ t: 'SET_THINKING', val: true });
       timerRef.current = setTimeout(() => {
         const kb = bk[cp.idx];
-        if (kb && botShouldAccuse(kb, diff)) {
+        if (kb && botShouldAccuse(kb, diff, rngRef.current)) {
           const acc = botBuildAccusation(kb);
           if (acc) { dispatch({ t: 'ACCUSE', ...acc }); return; }
         }
         if (Engine.canSuggest(game) && kb) {
           const pos = cp.position;
           if (pos.type === 'room') {
-            const { suspectId, weaponId } = botChooseSuggestion(kb, diff, pos.roomId);
+            const { suspectId, weaponId } = botChooseSuggestion(kb, diff, pos.roomId, rngRef.current);
             dispatch({ t: 'SUGGEST', suspectId, weaponId });
             return;
           }
@@ -374,7 +402,7 @@ export function useGame() {
   return {
     game:        st.game,
     botThinking: st.botThinking,
-    hasSave:     !!loadGame(),
+    hasSave:     hasSavedGame(),
 
     newGame: (config: Engine.GameConfig) => {
       setAckedSeq(-1);                       // reset acknowledgement for new game
@@ -382,28 +410,9 @@ export function useGame() {
       rngRef.current = makeRng(Date.now());
       dispatch({ t: 'INIT', config, seed: Date.now() });
     },
-    resumeSave: () => {
-      const saved = loadGame();
-      if (saved) dispatch({ t: 'INIT', config: {
-        numPlayers:    saved.players.length,
-        humanName:     saved.players.find(p => !p.isBot)?.name ?? 'Jogador',
-        humanSuspectId: saved.players.find(p => !p.isBot)?.suspectId ?? 0,
-        botDifficulty: saved.botDifficulty,
-      }, seed: Date.now() });
-      // Actually just restore from save directly
-      const s = loadGame();
-      if (s) {
-        rngRef.current = makeRng(Date.now());
-        dispatch({ t: 'INIT', config: {
-          numPlayers:     s.players.length,
-          humanName:      s.players.find(p => !p.isBot)?.name ?? 'Jogador',
-          humanSuspectId: s.players.find(p => !p.isBot)?.suspectId ?? 0,
-          botDifficulty:  s.botDifficulty,
-        }, seed: 1 }); // seed=1 so it re-deals; save isn't replayed here
-        // Note: for true resume we'd need to store the exact GameState JSON separately.
-        // This is handled by makeInitialState reading localStorage before any INIT.
-      }
-    },
+    // resumeSave removed: actual resume happens via makeInitialState reading localStorage
+    // before any INIT dispatch. App.tsx calls onResume={() => setStarted(true)} which
+    // displays GameScreen with the already-loaded state — no extra dispatch needed.
 
     roll:        ()                        => dispatch({ t: 'ROLL', rng: rngRef.current }),
     useSecret:   ()                        => dispatch({ t: 'SECRET' }),
